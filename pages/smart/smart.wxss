@@ -344,8 +344,7 @@ page {
 .input-bar {
   flex-shrink: 0;
   background: #FFF;
-  padding: 16rpx 0;
-  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  padding: 24rpx 0 16rpx 0;
 }
 
 .input-inner {
