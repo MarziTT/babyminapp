@@ -1,5 +1,5 @@
 var { getWeeklyReport } = require('../../../utils/api')
-var { getBabyId } = require('../../../utils/baby')
+var { getBabyId, isDemoUser } = require('../../../utils/baby')
 
 Page({
   data: {
@@ -11,6 +11,11 @@ Page({
   },
 
   onLoad: function () {
+    if (isDemoUser()) {
+      wx.showToast({ title: '体验模式无法使用报告功能', icon: 'none', duration: 2000 })
+      wx.navigateBack({ delta: 1 })
+      return
+    }
     var babyId = getBabyId()
     this.setData({ babyId: babyId })
     this.loadReport()

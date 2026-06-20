@@ -14,6 +14,13 @@ var MY_ROLE_KEY = 'babycare_my_role'
 var ACTIVE_BABY_KEY = 'babycare_active_baby'
 var BABY_INFO_KEY = 'babycare_baby_info'
 
+// ========== 体验模式检测 ==========
+
+function isDemoUser() {
+  var openid = getOpenId()
+  return !openid || openid.indexOf('demo_') === 0
+}
+
 // ========== OpenID ==========
 
 function getOpenId() {
@@ -102,6 +109,7 @@ module.exports = {
   // 用户身份
   getOpenId: getOpenId,
   setOpenId: setOpenId,
+  isDemoUser: isDemoUser,
   // 家庭
   getFamilyId: getFamilyId,
   setFamilyId: setFamilyId,

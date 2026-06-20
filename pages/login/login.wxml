@@ -18,7 +18,7 @@
     <text class="login-error" wx:if="{{error}}">{{error}}</text>
 
     <view class="login-skip" bindtap="onSkip">
-      <text class="skip-text">跳过登录，体验模式</text>
+      <text class="skip-text">跳过登录，体验模式（仅可浏览，无法创建家庭和查看报告）</text>
     </view>
   </view>
 

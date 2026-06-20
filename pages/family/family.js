@@ -1,5 +1,5 @@
 var { createFamily, joinFamily, getFamilyMembers, getBabies, createBaby, updateBaby, deleteBaby, getFamilyPermissions, updateFamilyPermissions, uploadAvatar } = require('../../utils/api')
-var { getOpenId, getFamilyId, setFamilyId, getMyRole, setMyRole, getActiveBaby, setActiveBaby } = require('../../utils/baby')
+var { getOpenId, getFamilyId, setFamilyId, getMyRole, setMyRole, getActiveBaby, setActiveBaby, isDemoUser } = require('../../utils/baby')
 
 Page({
   data: {
@@ -107,6 +107,10 @@ Page({
 
   // ========== 创建家庭 ==========
   onShowCreate: function () {
+    if (isDemoUser()) {
+      wx.showToast({ title: '体验模式无法创建家庭，请先登录微信', icon: 'none', duration: 2000 })
+      return
+    }
     this.setData({ showCreate: true, showJoin: false, inputBabyGender: 'male' })
   },
 
@@ -133,6 +137,10 @@ Page({
   onCreateFamily: function () {
     var self = this
     var openid = getOpenId()
+    if (isDemoUser()) {
+      wx.showToast({ title: '体验模式无法创建家庭，请先登录微信', icon: 'none', duration: 2000 })
+      return
+    }
     if (!openid) {
       wx.showToast({ title: '请先登录', icon: 'none' })
       return
@@ -154,6 +162,10 @@ Page({
 
   // ========== 加入家庭 ==========
   onShowJoin: function () {
+    if (isDemoUser()) {
+      wx.showToast({ title: '体验模式无法加入家庭，请先登录微信', icon: 'none', duration: 2000 })
+      return
+    }
     this.setData({ showJoin: true, showCreate: false })
   },
 
@@ -174,6 +186,10 @@ Page({
     var openid = getOpenId()
     var familyId = (self.data.inputFamilyId || '').trim()
 
+    if (isDemoUser()) {
+      wx.showToast({ title: '体验模式无法加入家庭，请先登录微信', icon: 'none', duration: 2000 })
+      return
+    }
     if (!openid) {
       wx.showToast({ title: '请先登录', icon: 'none' })
       return
@@ -293,6 +309,12 @@ Page({
   // 提交宝宝表单（添加/修改）
   onSubmitBaby: function () {
     var self = this
+
+    if (isDemoUser()) {
+      wx.showToast({ title: '体验模式无法添加宝宝，请先登录微信', icon: 'none', duration: 2000 })
+      return
+    }
+
     var familyId = self.data.familyId
     if (!familyId) {
       wx.showToast({ title: '请先创建家庭', icon: 'none' })

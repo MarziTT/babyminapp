@@ -7,7 +7,7 @@
  */
 
 var { getDailyReport, getWeeklyReport, getMonthlyReport, fetchAllRecords, getNotes } = require('../../utils/api')
-var { getFamilyId, getBabyId } = require('../../utils/baby')
+var { getFamilyId, getBabyId, isDemoUser } = require('../../utils/baby')
 
 Page({
   data: {
@@ -20,6 +20,11 @@ Page({
   },
 
   onLoad: function () {
+    if (isDemoUser()) {
+      wx.showToast({ title: '体验模式无法使用报告功能', icon: 'none', duration: 2000 })
+      wx.navigateBack({ delta: 1 })
+      return
+    }
     this.loadReport()
   },
 
