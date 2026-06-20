@@ -370,10 +370,15 @@ Page({
         })
       }
       var list = (events || []).map(function (e) {
+        var roleLabel = ''
+        var role = e.recorded_by_role || ''
+        if (role === 'mom') roleLabel = '妈妈'
+        else if (role === 'dad') roleLabel = '爸爸'
+        var name = e.recorded_by_name || (roleLabel || '家人')
         var labelMap = {
-          '喂奶': { label: '喂养', icon: '🍼', detail: (e.feed_type || '') + ' ' + (e.duration_minutes ? e.duration_minutes + '分钟' : '') + ' ' + (e.amount_ml ? e.amount_ml + 'ml' : '') },
+          '喂奶': { label: '喂养', icon: '🍼', detail: (e.feed_type === 'left' ? '左侧' : e.feed_type === 'right' ? '右侧' : e.feed_type === 'bottle' ? '瓶喂' : '') + ' ' + (e.duration_minutes ? e.duration_minutes + '分钟' : '') + ' ' + (e.amount_ml ? e.amount_ml + 'ml' : '') },
           '睡眠': { label: '睡眠', icon: '😴', detail: e.duration_minutes ? e.duration_minutes + '分钟' : '' },
-          '尿布': { label: '尿布', icon: '🧷', detail: e.diaper_type || '' },
+          '尿布': { label: '尿布', icon: '🧷', detail: e.diaper_type === 'wet' ? '尿尿' : e.diaper_type === 'dry' ? '干爽' : e.diaper_type === 'mixed' ? '尿尿+便便' : e.diaper_type || '' },
           '成长记录': { label: '成长记录', icon: '📏', detail: (e.height_cm ? e.height_cm + 'cm' : '') + ' ' + (e.weight_kg ? e.weight_kg + 'kg' : '') },
           '疫苗接种': { label: '疫苗接种', icon: '💉', detail: e.vaccine_name || e.status || '' },
           '用药记录': { label: '用药记录', icon: '💊', detail: e.medicine_name || '' },
@@ -385,7 +390,7 @@ Page({
           icon: info.icon,
           detail: info.detail,
           time: H.formatDisplayTime(e.start_time || e.time || e.record_date || e.scheduled_date || ''),
-          recordedByName: e.recorded_by_name || '',
+          recordedByName: roleLabel ? roleLabel + ' · ' + name : name,
           recordedByAvatar: e.recorded_by_avatar || ''
         }
       })

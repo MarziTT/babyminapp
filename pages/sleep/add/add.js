@@ -155,7 +155,8 @@ Page({
     var label = this.data.noteOptions[idx]
     if (label === undefined) return
     var current = this.data.selectedNote
-    this.setData({ selectedNote: current === label ? '' : label })
+    // 互斥：选预设则关闭自定义
+    this.setData({ selectedNote: current === label ? '' : label, showCustomInput: false, customNote: '' })
   },
 
   onCustomNoteInput: function(e) {
@@ -163,7 +164,12 @@ Page({
   },
 
   toggleCustomInput: function() {
-    this.setData({ showCustomInput: !this.data.showCustomInput })
+    // 互斥：开自定义则清预设
+    if (!this.data.showCustomInput) {
+      this.setData({ showCustomInput: true, selectedNote: '' })
+    } else {
+      this.setData({ showCustomInput: false, customNote: '' })
+    }
   },
 
   /* ===== 提交 ===== */
@@ -188,7 +194,8 @@ Page({
     if (this.data.mode !== 'edit') {
       var now = new Date()
       var startDate = new Date(startTime)
-      if (startDate > now) {
+      var endDate = new Date(endTime)
+      if (startDate > now || endDate > now) {
         wx.showToast({ title: '不能录入未来的记录', icon: 'none' })
         return
       }

@@ -34,6 +34,14 @@ Page({
 
         login(loginRes.code, userInfo.nickName, userInfo.avatarUrl)
           .then(function (res) {
+            // 微信登录成功：清除旧 demo 数据
+            var oldOpenid = getOpenId()
+            if (oldOpenid && oldOpenid.indexOf('demo_') === 0) {
+              wx.removeStorageSync('babycare_family_id')
+              wx.removeStorageSync('babycare_my_role')
+              wx.removeStorageSync('babycare_active_baby')
+              wx.removeStorageSync('babycare_baby_info')
+            }
             // 存储 openid
             setOpenId(res.openid)
             wx.setStorageSync('userInfo', {
@@ -68,7 +76,12 @@ Page({
   },
 
   onSkip: function () {
-    // 体验模式：生成本地 ID
+    // 体验模式：先清除登录态缓存，再生成 demo ID
+    wx.removeStorageSync('babycare_openid')
+    wx.removeStorageSync('babycare_family_id')
+    wx.removeStorageSync('babycare_my_role')
+    wx.removeStorageSync('babycare_active_baby')
+    wx.removeStorageSync('babycare_baby_info')
     var demoId = 'demo_' + Date.now()
     setOpenId(demoId)
     wx.setStorageSync('userInfo', {

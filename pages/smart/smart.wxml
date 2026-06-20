@@ -33,27 +33,22 @@
                 <view class="side-opt {{item.cardData.side === 'bottle' ? 'side-opt-active' : ''}}" data-msgid="{{item.id}}" data-side="bottle" bindtap="onCardSideSelect">瓶喂</view>
               </view>
             </view>
-            <view class="field-row">
+            <view class="field-row" wx:if="{{item.cardData.side === 'bottle'}}">
               <text class="field-label">奶量</text>
-              <input class="field-input" type="digit" value="{{item.cardData._amount_text || ''}}" placeholder="{{item.cardData.amount_ml || ''}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="amount_ml"/>
+              <input class="field-input" type="digit" value="{{item.cardData._amount_text || ''}}" placeholder="{{item.cardData.amount_ml || '输入毫升数'}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="amount_ml"/>
               <text class="field-unit">ml</text>
             </view>
-            <view class="field-row" wx:if="{{item.cardData.start_time}}">
-              <text class="field-label">时间</text>
-              <input class="field-input" value="{{item.cardData._time_display || item.cardData.start_time}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="start_time"/>
-            </view>
-            <!-- 时长（折叠） -->
-            <view class="field-row" wx:if="{{item.cardData._showDuration}}">
+            <view class="field-row" wx:if="{{item.cardData.side !== 'bottle' && item.cardData._showDuration}}">
               <text class="field-label">时长</text>
             </view>
-            <view class="preset-row" wx:if="{{item.cardData._showDuration}}">
+            <view class="preset-row" wx:if="{{item.cardData.side !== 'bottle' && item.cardData._showDuration}}">
               <text class="preset-btn {{item.cardData.duration_minutes === 5 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="5">5分钟</text>
               <text class="preset-btn {{item.cardData.duration_minutes === 10 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="10">10分钟</text>
               <text class="preset-btn {{item.cardData.duration_minutes === 15 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="15">15分钟</text>
               <text class="preset-btn {{item.cardData.duration_minutes === 20 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="20">20分钟</text>
               <text class="preset-btn {{item.cardData.duration_minutes === 30 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="30">30分钟</text>
             </view>
-            <view class="field-row" wx:if="{{item.cardData._showDuration}}">
+            <view class="field-row" wx:if="{{item.cardData.side !== 'bottle' && item.cardData._showDuration}}">
               <input class="field-input" type="digit" value="{{item.cardData._duration_text || ''}}" placeholder="或输入自定义" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="duration_minutes"/>
               <text class="field-unit">分钟</text>
             </view>

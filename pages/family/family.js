@@ -46,7 +46,7 @@ Page({
   onLoad: function () {
     var openid = getOpenId()
     var familyId = getFamilyId()
-    this.setData({ openid: openid, familyId: familyId, myRole: getMyRole() })
+    this.setData({ openid: openid, familyId: familyId, myRole: getMyRole(), isDemo: isDemoUser() })
     this.loadFamily()
   },
 
@@ -443,19 +443,28 @@ Page({
 
   catchTap: function () {},
 
-  // ========== 退出登录 ==========
+  // ========== 退出登录 / 退出体验模式 ==========
   onLogout: function () {
     var self = this
+    var isDemo = self.data.isDemo
     wx.showModal({
-      title: '退出登录',
-      content: '退出后需重新授权登录，确定退出吗？',
+      title: isDemo ? '退出体验模式' : '退出登录',
+      content: isDemo ? '退出后将返回登录页，可使用微信账号登录' : '退出后需重新授权登录，确定退出吗？',
       success: function (res) {
         if (res.confirm) {
+          // 清除所有本地缓存
           wx.removeStorageSync('userInfo')
           wx.removeStorageSync('babycare_openid')
           wx.removeStorageSync('babycare_family_id')
           wx.removeStorageSync('babycare_my_role')
           wx.removeStorageSync('babycare_active_baby')
+          wx.removeStorageSync('babycare_baby_info')
+          // 清除 app 全局缓存
+          var app = getApp()
+          if (app) {
+            app.globalData.activeBaby = null
+            app.globalData.voicePreFill = null
+          }
           wx.reLaunch({ url: '/pages/login/login' })
         }
       }

@@ -50,7 +50,7 @@
       <text wx:if="{{confirmData.side}}">方式：{{confirmData.side === 'left' ? '左侧' : confirmData.side === 'right' ? '右侧' : '瓶喂'}}</text>
       <text wx:else class="missing-hint">请点击"确认保存"后选择喂奶方式</text>
       <text>时长：{{confirmData.duration_minutes || 0}} 分钟</text>
-      <text wx:if="{{confirmData.amount_ml}}">奶量：{{confirmData.amount_ml}} ml</text>
+      <text wx:if="{{confirmData.side === 'bottle' && confirmData.amount_ml}}">奶量：{{confirmData.amount_ml}} ml</text>
       <text wx:if="{{confirmData.start_time}}" class="time-text">时间：{{confirmData._time_display || confirmData.start_time}}</text>
     </view>
     <view class="confirm-fields" wx:elif="{{confirmType === '睡眠'}}">

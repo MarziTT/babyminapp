@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="header">
+    <text class="title">用药记录</text>
+    <text class="add-btn" bindtap="goAdd">+ 新增</text>
+  </view>
+
+  <view class="date-switcher">
+    <text class="date-arrow" bindtap="prevDay">◀</text>
+    <picker mode="date" value="{{targetDate}}" end="{{targetDate}}" bindchange="onDateChange">
+      <text class="date-text">{{dateDisplay}}</text>
+    </picker>
+    <text class="date-arrow" bindtap="nextDay">▶</text>
+  </view>
+
+  <view class="list" wx:if="{{records.length > 0}}">
+    <view class="item" wx:for="{{records}}" wx:key="id">
+      <view class="item-body" bindtap="editRecord" data-id="{{item.id}}">
+        <view class="item-left">
+          <text class="item-type">{{item.medicine_name}}</text>
+          <text class="item-date">{{item.displayTime}}</text>
+        </view>
+        <view class="item-right">
+          <text class="item-metric" wx:if="{{item.dosage}}">{{item.dosage}}{{item.unit}}</text>
+          <text class="item-note" wx:if="{{item.note}}">{{item.note}}</text>
+        </view>
+      </view>
+      <text class="delete-btn" catchtap="deleteRecord" data-id="{{item.id}}">✕</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text>暂无用药记录</text>
+  </view>
+</view>

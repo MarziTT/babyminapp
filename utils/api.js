@@ -275,6 +275,10 @@ function getVaccinations(babyId, status, dateFrom, dateTo) {
   return request('/api/vaccination' + params)
 }
 
+function getVaccination(id) {
+  return request('/api/vaccination/' + id)
+}
+
 function createVaccination(data) {
   return request('/api/vaccination', { method: 'POST', data: data })
 }
@@ -538,6 +542,7 @@ module.exports = {
   deleteGrowth: deleteGrowth,
   // 疫苗
   getVaccinations: getVaccinations,
+  getVaccination: getVaccination,
   createVaccination: createVaccination,
   updateVaccination: updateVaccination,
   deleteVaccination: deleteVaccination,

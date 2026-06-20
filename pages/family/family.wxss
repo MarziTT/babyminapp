@@ -36,9 +36,13 @@
   font-size: 26rpx;
   color: #999;
   text-align: center;
-  margin-bottom: 48rpx;
+  margin-bottom: 40rpx;
   line-height: 1.6;
   padding: 0 40rpx;
+}
+
+.empty-logout {
+  margin-top: 24rpx;
 }
 .empty-actions {
   display: flex;
@@ -230,15 +234,21 @@
   margin-left: 4rpx;
 }
 
-/* 退出登录链接 */
+/* 退出登录按钮 */
 .logout-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8rpx 0;
+  width: 480rpx;
+  height: 80rpx;
+  border: 2rpx solid #FF6B6B;
+  border-radius: 40rpx;
+  background: rgba(255, 107, 107, 0.06);
+  margin: 0 auto;
 }
 .logout-link-text {
-  font-size: 26rpx;
+  font-size: 28rpx;
+  font-weight: 600;
   color: #FF6B6B;
 }
 

@@ -172,7 +172,7 @@ Page({
     if (recordType === 'feeding') {
       payload.feed_type = data.side || 'right'
       payload.duration_minutes = data.duration_minutes || 0
-      payload.amount_ml = data.amount_ml || 0
+      payload.amount_ml = data.side === 'bottle' ? (data.amount_ml || 0) : 0
       if (data.start_time) payload.start_time = data.start_time
       if (data.end_time) payload.end_time = data.end_time
     } else if (recordType === 'sleep') {

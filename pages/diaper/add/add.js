@@ -94,10 +94,11 @@ Page({
     var label = this.data.noteOptions[idx]
     if (label === undefined) return
     var current = this.data.selectedNote
+    // 互斥：选预设则关闭自定义
     if (current === label) {
-      this.setData({ selectedNote: '' })
+      this.setData({ selectedNote: '', showCustomInput: false })
     } else {
-      this.setData({ selectedNote: label })
+      this.setData({ selectedNote: label, showCustomInput: false, customNote: '' })
     }
   },
 
@@ -106,7 +107,12 @@ Page({
   },
 
   toggleCustomInput: function() {
-    this.setData({ showCustomInput: !this.data.showCustomInput })
+    // 互斥：开自定义则清预设
+    if (!this.data.showCustomInput) {
+      this.setData({ showCustomInput: true, selectedNote: '' })
+    } else {
+      this.setData({ showCustomInput: false, customNote: '' })
+    }
   },
 
   onSubmit: function() {

@@ -1,0 +1,28 @@
+<view class="container">
+  <view class="header">
+    <text class="title">疫苗接种</text>
+    <text class="add-btn" bindtap="goAdd">+ 新增</text>
+  </view>
+
+  <view class="list" wx:if="{{records.length > 0}}">
+    <view class="item" wx:for="{{records}}" wx:key="id">
+      <view class="item-body" bindtap="editRecord" data-id="{{item.id}}">
+        <view class="item-left">
+          <text class="item-type">{{item.vaccine_name}}</text>
+          <text class="item-date">{{item.displayTime}}</text>
+        </view>
+        <view class="item-right">
+          <text class="item-status completed" wx:if="{{item.status === 'completed'}}">已完成</text>
+          <text class="item-status upcoming" wx:elif="{{item.status === 'upcoming'}}">待接种</text>
+          <text class="item-status skipped" wx:elif="{{item.status === 'skipped'}}">已跳过</text>
+          <text class="item-status upcoming" wx:else>待接种</text>
+        </view>
+      </view>
+      <text class="delete-btn" catchtap="deleteRecord" data-id="{{item.id}}">✕</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text>暂无接种记录</text>
+  </view>
+</view>

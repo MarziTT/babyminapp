@@ -1,0 +1,63 @@
+/**
+ * 喂奶计时器 — 暖奶主题
+ */
+.page {
+  width: 100vw; min-height: 100vh;
+  background: linear-gradient(180deg, #FBE9E7 0%, #FFF3E0 30%, #FFF8F0 70%, #FBE9E7 100%);
+  display: flex; flex-direction: column; align-items: center;
+  overflow: hidden; position: relative;
+}
+
+/* 返回按钮 */
+.back-btn { position: absolute; top: 60rpx; left: 40rpx; z-index: 10; }
+.back-arrow { font-size: 40rpx; color: #BF8F7F; padding: 16rpx; }
+
+/* 标题 */
+.title-area { margin-top: 200rpx; text-align: center; z-index: 2; }
+.main-title { font-size: 44rpx; font-weight: 700; color: #5D4037; display: block; }
+.sub-title { font-size: 26rpx; color: #8D6E63; margin-top: 16rpx; display: block; }
+
+/* 计时器圆盘 */
+.timer-ring {
+  margin-top: 120rpx;
+  width: 440rpx; height: 440rpx;
+  border-radius: 50%;
+  background: rgba(255, 224, 178, 0.3);
+  border: 6rpx solid rgba(191, 143, 127, 0.25);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 2;
+  transition: all 0.4s ease;
+}
+.timer-ring.active {
+  border-color: rgba(255, 138, 101, 0.5);
+  box-shadow: 0 0 80rpx rgba(255, 138, 101, 0.15), inset 0 0 60rpx rgba(255, 138, 101, 0.05);
+  animation: breathe 2s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.timer-inner {
+  width: 380rpx; height: 380rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 248, 240, 0.95), rgba(251, 233, 231, 0.95));
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
+.timer-display {
+  font-size: 80rpx; font-weight: 200;
+  color: #5D4037;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 6rpx;
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+}
+
+.timer-hint {
+  font-size: 24rpx; color: #A1887F;
+  margin-top: 12rpx;
+}
+
+/* 底部提示 */
+.footer-hint { position: absolute; bottom: 120rpx; z-index: 2; }
+.footer-hint text { font-size: 22rpx; color: #BCAAA4; }

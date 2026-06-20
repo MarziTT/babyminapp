@@ -7,6 +7,7 @@ Page({
     mode: 'add',
     isEdit: false,
     recordId: '',
+    activeTab: 'timer',         // 'timer' | 'manual'
     feedType: 'left',
     feedTypeLabel: '左侧亲喂',
     amountMl: '',
@@ -21,16 +22,22 @@ Page({
     endDate: H.nowDate(),
     endTimeVal: H.nowTime(),
     durationMinutes: 0,
+
+    // 计时器
+    isRunning: false,
+    isPaused: false,
+    elapsedSeconds: 0,
+    timerDisplay: '00:00',
+    _timer: null
   },
 
   onLoad: function(options) {
     var self = this
     if (options && options.from === 'timer') {
-      // 从计时器页面过来：已有时长
       var startTime = decodeURIComponent(options.startTime || '')
       var endTime = decodeURIComponent(options.endTime || '')
       var durMin = parseInt(options.duration) || 0
-      this.setData({ showTimePickers: true, })
+      this.setData({ activeTab: 'manual', showTimePickers: true })
       if (startTime) {
         var sp = startTime.split('T')
         this.setData({ startDate: sp[0], startTimeVal: sp[1].substring(0, 5) })
@@ -65,12 +72,13 @@ Page({
       if (vp && vp.type === 'feeding') {
         var d = vp.data
         var labels = { left: '左侧亲喂', right: '右侧亲喂', bottle: '瓶喂' }
-        var durMin = d.duration_minutes || 0
+        var durMin2 = d.duration_minutes || 0
         var now = new Date()
-        var startMs = now.getTime() - durMin * 60 * 1000
+        var startMs = now.getTime() - durMin2 * 60 * 1000
         var sd = new Date(startMs)
         var ed = new Date(now)
         this.setData({
+          activeTab: 'manual',
           showTimePickers: true,
           feedType: d.side || 'bottle',
           feedTypeLabel: labels[d.side] || '瓶喂',
@@ -79,7 +87,7 @@ Page({
           startTimeVal: H.pad2(sd.getHours()) + ':' + H.pad2(sd.getMinutes()),
           endDate: ed.getFullYear() + '-' + H.pad2(ed.getMonth() + 1) + '-' + H.pad2(ed.getDate()),
           endTimeVal: H.pad2(ed.getHours()) + ':' + H.pad2(ed.getMinutes()),
-          durationMinutes: durMin,
+          durationMinutes: durMin2,
         })
         getApp().globalData.voicePreFill = null
       }
@@ -124,6 +132,7 @@ Page({
       mode: 'edit',
       isEdit: true,
       recordId: record.id,
+      activeTab: 'manual',
       showTimePickers: true,
       feedType: record.feed_type || 'left',
       feedTypeLabel: labels[record.feed_type] || '左侧亲喂',
@@ -140,11 +149,151 @@ Page({
     })
   },
 
-  goTimer: function () {
+  /* ===== Tab 切换 ===== */
+
+  switchTab: function(e) {
+    var tab = e.currentTarget.dataset.tab
+    if (tab === this.data.activeTab) return
+    if (this.data.activeTab === 'timer') {
+      this.clearTimer()
+      this.setData({ isRunning: false, isPaused: false, elapsedSeconds: 0, timerDisplay: '00:00' })
+    }
+    this.setData({ activeTab: tab })
+  },
+
+  /* ===== 计时器 ===== */
+
+  onUnload: function() {
+    this.clearTimer()
+  },
+
+  startTimer: function() {
+    var self = this
+    this.setData({ isRunning: true, isPaused: false, elapsedSeconds: 0, timerDisplay: '00:00' })
+    this.data._timer = setInterval(function() {
+      var elapsed = self.data.elapsedSeconds + 1
+      var m = Math.floor(elapsed / 60)
+      var s = elapsed % 60
+      self.setData({
+        elapsedSeconds: elapsed,
+        timerDisplay: H.pad2(m) + ':' + H.pad2(s)
+      })
+    }, 1000)
+  },
+
+  pauseTimer: function() {
+    this.clearInterval()
+    this.setData({ isPaused: true })
+  },
+
+  resumeTimer: function() {
+    var self = this
+    this.setData({ isPaused: false })
+    this.data._timer = setInterval(function() {
+      var elapsed = self.data.elapsedSeconds + 1
+      var m = Math.floor(elapsed / 60)
+      var s = elapsed % 60
+      self.setData({
+        elapsedSeconds: elapsed,
+        timerDisplay: H.pad2(m) + ':' + H.pad2(s)
+      })
+    }, 1000)
+  },
+
+  resetTimer: function() {
+    this.clearInterval()
+    this.setData({
+      isRunning: false,
+      isPaused: false,
+      elapsedSeconds: 0,
+      timerDisplay: '00:00'
+    })
+  },
+
+  clearInterval: function() {
+    if (this.data._timer) {
+      clearInterval(this.data._timer)
+      this.data._timer = null
+    }
+  },
+
+  clearTimer: function() {
+    this.clearInterval()
+  },
+
+  onTimerSave: function() {
+    var self = this
+    var durationSeconds = this.data.elapsedSeconds
+
+    if (durationSeconds < 10) {
+      wx.showToast({ title: '记录时间太短', icon: 'none' })
+      return
+    }
+
+    var feedType = this.data.feedType
+    var amountMl = this.data.amountMl
+
+    if (feedType === 'bottle' && !Number(amountMl)) {
+      wx.showToast({ title: '请输入奶量', icon: 'none' })
+      return
+    }
+
+    var now = new Date()
+    var startMs = now.getTime() - durationSeconds * 1000
+    var sd = new Date(startMs)
+    var ed = now
+    var startTime = sd.getFullYear() + '-' + H.pad2(sd.getMonth() + 1) + '-' + H.pad2(sd.getDate()) + 'T' + H.pad2(sd.getHours()) + ':' + H.pad2(sd.getMinutes()) + ':00'
+    var endTime = ed.getFullYear() + '-' + H.pad2(ed.getMonth() + 1) + '-' + H.pad2(ed.getDate()) + 'T' + H.pad2(ed.getHours()) + ':' + H.pad2(ed.getMinutes()) + ':00'
+    var durMin = Math.round(durationSeconds / 60)
+
+    var note = this.data.selectedNote
+    if (this.data.customNote.trim()) {
+      note = note ? note + '，' + this.data.customNote.trim() : this.data.customNote.trim()
+    }
+
+    var babyId = getBabyId() || 'baby-001'
+
+    var record = {
+      baby_id: babyId,
+      family_id: getFamilyId(),
+      feed_type: feedType,
+      start_time: startTime,
+      end_time: endTime,
+      duration_minutes: durMin,
+      amount_ml: feedType === 'bottle' ? Number(amountMl) || 0 : 0,
+      note: note,
+      recorded_by: getOpenId(),
+    }
+
+    var promise
+    if (this.data.mode === 'edit') {
+      promise = updateFeeding(this.data.recordId, record)
+    } else {
+      promise = createFeeding(record)
+    }
+
+    this.clearTimer()
+    this.setData({ isRunning: false, isPaused: false })
+
+    promise.then(function() {
+      wx.showToast({ title: '保存成功', icon: 'success' })
+      getApp().globalData.editRecord = null
+      wx.removeStorageSync('editRecord_feeding')
+      if (self._fromVoice) {
+        getApp().globalData.voiceSaveCompleted = true
+      }
+      setTimeout(function() { wx.navigateBack() }, 1500)
+    }).catch(function(e) {
+      console.error('[FeedingAdd] 保存失败:', e)
+      wx.showToast({ title: (e && e.message) || '操作失败', icon: 'none' })
+    })
+  },
+
+  goTimer: function() {
     wx.navigateTo({ url: '/pages/feeding/timer/timer' })
   },
 
-  onUnload: function() {
+  /* ===== 类型切换 ===== */
 
   switchType: function(e) {
     var type = e.currentTarget.dataset.type
@@ -160,12 +309,13 @@ Page({
     this.setData({ amountMl: val })
   },
 
+  /* ===== 备注 ===== */
+
   onToggleNote: function(e) {
     var idx = e.currentTarget.dataset.idx
     var label = this.data.noteOptions[idx]
     if (label === undefined) return
     var current = this.data.selectedNote
-    // 互斥：选预设则关闭自定义
     this.setData({ selectedNote: current === label ? '' : label, showCustomInput: false, customNote: '' })
   },
 
@@ -174,7 +324,6 @@ Page({
   },
 
   toggleCustomInput: function() {
-    // 互斥：开自定义则清预设
     if (!this.data.showCustomInput) {
       this.setData({ showCustomInput: true, selectedNote: '' })
     } else {
@@ -182,6 +331,7 @@ Page({
     }
   },
 
+  /* ===== 手动模式时间选择 ===== */
 
   onStartDateChange: function(e) {
     this.setData({ startDate: e.detail.value })
@@ -209,6 +359,8 @@ Page({
     var diff = Math.round((end - start) / 60000)
     this.setData({ durationMinutes: diff > 0 ? diff : 0 })
   },
+
+  /* ===== 手动模式提交 ===== */
 
   onSubmit: function() {
     var self = this
@@ -259,7 +411,6 @@ Page({
       wx.showToast({ title: '保存成功', icon: 'success' })
       getApp().globalData.editRecord = null
       wx.removeStorageSync('editRecord_feeding')
-      // 从语音页来的：设标志让语音页清卡片并回首页
       if (self._fromVoice) {
         getApp().globalData.voiceSaveCompleted = true
       }

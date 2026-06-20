@@ -1,5 +1,12 @@
 <!-- 添加喂奶记录 -->
 <view class="container">
+  <!-- 实时记录入口 -->
+  <view class="timer-entry" wx:if="{{!isEdit}}" bindtap="goTimer">
+    <text class="timer-entry-icon">⏱</text>
+    <text class="timer-entry-label">实时记录</text>
+    <text class="timer-entry-sub">点击开始计时宝宝喂奶</text>
+  </view>
+
   <!-- 喂奶类型切换 -->
   <view class="type-switch">
     <view class="type-item {{feedType === 'left' ? 'active' : ''}}" bindtap="switchType" data-type="left">
@@ -16,26 +23,7 @@
     </view>
   </view>
 
-  <!-- 计时器（普通添加模式） -->
-  <view class="timer-section" wx:if="{{!showTimePickers}}">
-    <view class="timer-circle" bindtap="toggleTimer">
-      <text class="timer-display">{{timerDisplay}}</text>
-      <text class="timer-hint">{{isTiming ? '点击停止' : '点击开始计时'}}</text>
-    </view>
-    <text class="timer-label">喂奶时长 {{feedTypeLabel}}</text>
-    <!-- 快速时长预设 -->
-    <view class="quick-durations">
-      <text class="quick-btn {{durationPreset === 5 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="5">5分钟</text>
-      <text class="quick-btn {{durationPreset === 10 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="10">10分钟</text>
-      <text class="quick-btn {{durationPreset === 15 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="15">15分钟</text>
-      <text class="quick-btn {{durationPreset === 20 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="20">20分钟</text>
-      <text class="quick-btn {{durationPreset === 30 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="30">30分钟</text>
-      <text class="quick-btn {{durationPreset === -1 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="-1">自定义</text>
-    </view>
-    <input wx:if="{{durationPreset === -1}}" class="custom-duration-input" type="number" placeholder="输入分钟数" value="{{customDuration}}" bindinput="onCustomDurationInput"/>
-  </view>
-
-  <!-- 时间选择器（编辑 / 语音模式） -->
+  <!-- 时间选择器 (手动录入模式) -->
   <view wx:if="{{showTimePickers}}">
     <view class="input-group">
       <text class="input-label">开始时间</text>

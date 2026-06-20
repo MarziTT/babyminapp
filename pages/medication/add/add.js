@@ -1,5 +1,13 @@
-﻿var { createMedication, updateMedication, getMedication } = require('../../../utils/api')
+var { createMedication, updateMedication, getMedication } = require('../../../utils/api')
 var { getBabyId, getOpenId, getFamilyId } = require('../../../utils/baby')
+
+var MEDICINE_OPTIONS = [
+  '布洛芬', '对乙酰氨基酚', '蒙脱石散', '益生菌',
+  '维生素D', '钙剂', '铁剂', '锌剂',
+  '氨溴索', '氯雷他定', '头孢克洛', '阿莫西林',
+  '氨酚黄那敏', '生理盐水', '氧化锌软膏', '炉甘石洗剂',
+  '自定义'
+]
 
 Page({
   data: {
@@ -10,7 +18,10 @@ Page({
     unit: 'ml',
     frequency: '',
     note: '',
-    freqOptions: ['每日1次', '每日2次', '每日3次', '每4小时', '每6小时', '每8小时', '每12小时', '必要时']
+    medicineOptions: MEDICINE_OPTIONS,
+    freqOptions: ['每日1次', '每日2次', '每日3次', '每4小时', '每6小时', '每8小时', '每12小时', '必要时'],
+    showCustomInput: false,
+    customMedicineName: ''
   },
 
   onLoad: function (options) {
@@ -51,19 +62,33 @@ Page({
   },
 
   fillForm: function (record) {
+    var medicineName = record.medicine_name || ''
+    var isCustom = MEDICINE_OPTIONS.indexOf(medicineName) === -1
     this.setData({
       mode: 'edit',
       recordId: record.id,
-      medicineName: record.medicine_name || '',
+      medicineName: medicineName,
       dosage: record.dosage || '',
       unit: record.unit || 'ml',
       frequency: record.frequency || '',
-      note: record.note || ''
+      note: record.note || '',
+      showCustomInput: isCustom,
+      customMedicineName: isCustom ? medicineName : ''
     })
   },
 
-  onNameInput: function (e) {
-    this.setData({ medicineName: e.detail.value })
+  onMedicineSelect: function (e) {
+    var index = e.detail.value
+    var name = MEDICINE_OPTIONS[index]
+    if (name === '自定义') {
+      this.setData({ showCustomInput: true, medicineName: '' })
+    } else {
+      this.setData({ showCustomInput: false, medicineName: name, customMedicineName: '' })
+    }
+  },
+
+  onCustomNameInput: function (e) {
+    this.setData({ customMedicineName: e.detail.value, medicineName: e.detail.value })
   },
 
   onDosageInput: function (e) {
@@ -99,7 +124,7 @@ Page({
     var babyId = getBabyId() || 'baby-001'
 
     if (!self.data.medicineName.trim()) {
-      wx.showToast({ title: '请输入药品名称', icon: 'none' })
+      wx.showToast({ title: '请选择或输入药品名称', icon: 'none' })
       return
     }
 
