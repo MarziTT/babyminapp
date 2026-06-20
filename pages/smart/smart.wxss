@@ -344,17 +344,12 @@ page {
 .input-bar {
   flex-shrink: 0;
   background: #FFF;
-  padding: 24rpx 0 16rpx 0;
+  padding: 20rpx 0 16rpx 0;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .input-inner {
   padding: 0 16rpx;
-}
-
-.input-divider {
-  height: 1rpx;
-  background: #E8ECF1;
-  margin-bottom: 16rpx;
 }
 
 .input-row {

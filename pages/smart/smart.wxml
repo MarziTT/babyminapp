@@ -192,7 +192,6 @@
 
   <!-- 输入栏 -->
   <view class="input-bar">
-    <view class="input-divider"></view>
     <view class="input-inner">
     <view class="input-row">
       <input
