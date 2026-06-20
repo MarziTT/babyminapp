@@ -202,6 +202,7 @@ Page({
     }
     payload.baby_id = data.baby_id
     payload.family_id = getFamilyId()
+    payload.recorded_by = getOpenId()
 
     console.log('[Voice onConfirm] recordType:', recordType, 'payload:', JSON.stringify(payload))
 

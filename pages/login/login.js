@@ -1,5 +1,8 @@
 var { login } = require('../../utils/api')
-var { setOpenId, getOpenId, setFamilyId, getFamilyId, setMyRole } = require('../../utils/baby')
+var {
+  setOpenId, getOpenId, setFamilyId, getFamilyId, setMyRole,
+  backupLoginData, restoreLoginData
+} = require('../../utils/baby')
 
 Page({
   data: {
@@ -8,7 +11,6 @@ Page({
   },
 
   onLoad: function () {
-    // 检查是否已登录
     var openid = getOpenId()
     if (openid) {
       this.goHome()
@@ -34,22 +36,16 @@ Page({
 
         login(loginRes.code, userInfo.nickName, userInfo.avatarUrl)
           .then(function (res) {
-            // 微信登录成功：清除旧 demo 数据
-            var oldOpenid = getOpenId()
-            if (oldOpenid && oldOpenid.indexOf('demo_') === 0) {
-              wx.removeStorageSync('babycare_family_id')
-              wx.removeStorageSync('babycare_my_role')
-              wx.removeStorageSync('babycare_active_baby')
-              wx.removeStorageSync('babycare_baby_info')
-            }
-            // 存储 openid
+            // 微信登录：先尝试恢复之前备份的登录数据
+            restoreLoginData()
+
+            // 覆盖为服务器返回的最新数据
             setOpenId(res.openid)
             wx.setStorageSync('userInfo', {
               nickname: res.nickname || userInfo.nickName,
               avatarUrl: res.avatarUrl || userInfo.avatarUrl
             })
 
-            // 如果有家庭，存储 familyId 和 role
             if (res.family) {
               setFamilyId(res.family.family_id)
               setMyRole(res.family.role)
@@ -76,12 +72,15 @@ Page({
   },
 
   onSkip: function () {
-    // 体验模式：先清除登录态缓存，再生成 demo ID
+    // 体验模式：先备份微信登录数据，再清除当前缓存
+    backupLoginData()
     wx.removeStorageSync('babycare_openid')
     wx.removeStorageSync('babycare_family_id')
     wx.removeStorageSync('babycare_my_role')
     wx.removeStorageSync('babycare_active_baby')
     wx.removeStorageSync('babycare_baby_info')
+    wx.removeStorageSync('userInfo')
+
     var demoId = 'demo_' + Date.now()
     setOpenId(demoId)
     wx.setStorageSync('userInfo', {

@@ -144,6 +144,21 @@ Page({
     wx.navigateTo({ url: '/pages/feeding/timer/timer' })
   },
 
+  onTimerResult: function (durationSeconds) {
+    var durMin = Math.round(durationSeconds / 60)
+    var now = new Date()
+    var startMs = now.getTime() - durationSeconds * 1000
+    var sd = new Date(startMs)
+    this.setData({
+      durationMinutes: durMin,
+      startDate: sd.getFullYear() + '-' + H.pad2(sd.getMonth() + 1) + '-' + H.pad2(sd.getDate()),
+      startTimeVal: H.pad2(sd.getHours()) + ':' + H.pad2(sd.getMinutes()),
+      endDate: H.nowDate(),
+      endTimeVal: H.nowTime(),
+      showTimePickers: true
+    })
+  },
+
   onUnload: function() {
 
   switchType: function(e) {

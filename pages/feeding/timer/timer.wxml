@@ -1,4 +1,9 @@
 <view class="page">
+  <!-- 柔和暖色气泡装饰 -->
+  <view class="bubbles">
+    <view class="bubble" wx:for="{{8}}" wx:key="*this" style="left: {{item * 11 + 3}}%; top: {{item * 13 % 75 + 8}}%; animation-delay: {{item * 0.25}}s; animation-duration: {{3 + item * 0.5}}s;"></view>
+  </view>
+
   <!-- 返回按钮 -->
   <view class="back-btn" bindtap="goBack">
     <text class="back-arrow">←</text>

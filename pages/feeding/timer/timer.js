@@ -45,17 +45,12 @@ Page({
       return
     }
 
-    var now = new Date()
-    var startMs = now.getTime() - durationSeconds * 1000
-    var sd = new Date(startMs)
-    var ed = now
-    var startTime = sd.getFullYear() + '-' + H.pad2(sd.getMonth() + 1) + '-' + H.pad2(sd.getDate()) + 'T' + H.pad2(sd.getHours()) + ':' + H.pad2(sd.getMinutes()) + ':00'
-    var endTime = ed.getFullYear() + '-' + H.pad2(ed.getMonth() + 1) + '-' + H.pad2(ed.getDate()) + 'T' + H.pad2(ed.getHours()) + ':' + H.pad2(ed.getMinutes()) + ':00'
-    var durMin = Math.round(durationSeconds / 60)
-
-    wx.redirectTo({
-      url: '/pages/feeding/add/add?from=timer&startTime=' + encodeURIComponent(startTime) + '&endTime=' + encodeURIComponent(endTime) + '&duration=' + durMin
-    })
+    var pages = getCurrentPages()
+    var prevPage = pages[pages.length - 2]
+    if (prevPage && typeof prevPage.onTimerResult === 'function') {
+      prevPage.onTimerResult(durationSeconds)
+    }
+    wx.navigateBack()
   },
 
   clearTimer: function () {

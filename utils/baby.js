@@ -105,6 +105,34 @@ function saveBabyInfo(info) {
   wx.setStorageSync(BABY_INFO_KEY, info)
 }
 
+// ========== 体验/登录缓存分离 ==========
+
+var LOGIN_KEYS = [OPENID_KEY, FAMILY_ID_KEY, MY_ROLE_KEY, ACTIVE_BABY_KEY, BABY_INFO_KEY, 'userInfo']
+
+function backupLoginData() {
+  LOGIN_KEYS.forEach(function (key) {
+    var val = wx.getStorageSync(key)
+    if (val) {
+      wx.setStorageSync(key + '_bak', val)
+    }
+  })
+}
+
+function restoreLoginData() {
+  var restored = false
+  LOGIN_KEYS.forEach(function (key) {
+    var bak = wx.getStorageSync(key + '_bak')
+    if (bak) {
+      wx.setStorageSync(key, bak)
+      wx.removeStorageSync(key + '_bak')
+      restored = true
+    }
+  })
+  return restored
+}
+
+// ========== 导出 ==========
+
 module.exports = {
   // 用户身份
   getOpenId: getOpenId,
@@ -124,5 +152,8 @@ module.exports = {
   generateBabyId: generateBabyId,
   getBabyInfo: getBabyInfo,
   getBabyId: getBabyId,
-  saveBabyInfo: saveBabyInfo
+  saveBabyInfo: saveBabyInfo,
+  // 缓存分离
+  backupLoginData: backupLoginData,
+  restoreLoginData: restoreLoginData
 }
