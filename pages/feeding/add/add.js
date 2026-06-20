@@ -160,6 +160,7 @@ Page({
   },
 
   onUnload: function() {
+  },
 
   switchType: function(e) {
     var type = e.currentTarget.dataset.type

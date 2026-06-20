@@ -1,29 +1,59 @@
-<!-- 涂药计时器 -->
+<!-- 快捷计时器 -->
 <view class="page">
 
   <!-- 计时显示区 -->
   <view class="timer-display">
-    <view class="timer-ring {{isRunning ? 'running' : ''}} {{isFinished ? 'finished' : ''}}">
-      <text class="timer-min">{{minDisplay}}</text>
-      <text class="timer-colon">:</text>
-      <text class="timer-sec">{{secDisplay}}</text>
+    <view class="timer-ring-wrap">
+      <!-- 外圈进度环 -->
+      <view class="ring-bg"></view>
+      <view class="ring-progress {{isRunning ? 'running' : ''}} {{isFinished ? 'finished' : ''}}" style="transform: rotate({{ringDeg}}deg); opacity: {{ringOpacity}};"></view>
+      <!-- 内圆时间显示 -->
+      <view class="timer-inner">
+        <view class="timer-row">
+          <text class="timer-min">{{minDisplay}}</text>
+          <text class="timer-colon">:</text>
+          <text class="timer-sec">{{secDisplay}}</text>
+        </view>
+        <text class="timer-hint" wx:if="{{!isRunning && !isPaused && !isFinished}}">选择时长后开始</text>
+        <text class="timer-hint" wx:elif="{{isRunning}}">计时中</text>
+        <text class="timer-hint" wx:elif="{{isPaused}}">已暂停</text>
+        <text class="timer-hint" wx:elif="{{isFinished}}">已完成</text>
+      </view>
     </view>
 
     <!-- 控制按钮 -->
     <view class="timer-controls">
       <block wx:if="{{!isRunning && !isPaused && !isFinished}}">
-        <button class="btn-start" bindtap="startTimer" disabled="{{remaining <= 0}}">开始计时</button>
+        <button class="ctrl-btn ctrl-start" bindtap="startTimer" disabled="{{remaining <= 0}}">
+          <text class="ctrl-icon">▶</text>
+          <text>开始</text>
+        </button>
       </block>
       <block wx:elif="{{isRunning}}">
-        <button class="btn-pause" bindtap="pauseTimer">暂停</button>
-        <button class="btn-reset" bindtap="resetTimer">重置</button>
+        <button class="ctrl-btn ctrl-pause" bindtap="pauseTimer">
+          <text class="ctrl-icon">⏸</text>
+          <text>暂停</text>
+        </button>
+        <button class="ctrl-btn ctrl-reset" bindtap="resetTimer">
+          <text class="ctrl-icon">↺</text>
+          <text>重置</text>
+        </button>
       </block>
       <block wx:elif="{{isPaused}}">
-        <button class="btn-start" bindtap="resumeTimer">继续</button>
-        <button class="btn-reset" bindtap="resetTimer">重置</button>
+        <button class="ctrl-btn ctrl-start" bindtap="resumeTimer">
+          <text class="ctrl-icon">▶</text>
+          <text>继续</text>
+        </button>
+        <button class="ctrl-btn ctrl-reset" bindtap="resetTimer">
+          <text class="ctrl-icon">↺</text>
+          <text>重置</text>
+        </button>
       </block>
       <block wx:elif="{{isFinished}}">
-        <button class="btn-reset" bindtap="resetTimer">重新开始</button>
+        <button class="ctrl-btn ctrl-finish" bindtap="resetTimer">
+          <text class="ctrl-icon">↺</text>
+          <text>重新开始</text>
+        </button>
       </block>
     </view>
   </view>
@@ -41,35 +71,35 @@
     </view>
 
     <view class="custom-input">
-      <text class="section-label">自定义</text>
+      <text class="section-label">自定义时长</text>
       <view class="input-row">
-        <input class="number-input" type="number" placeholder="输入分钟" value="{{customMinutes}}" bindinput="onCustomInput" />
+        <input class="number-input" type="number" placeholder="输入分钟数" value="{{customMinutes}}" bindinput="onCustomInput" />
         <text class="input-unit">分钟</text>
       </view>
     </view>
   </view>
 
   <!-- 计时完成后的保存表单 -->
-  <view wx:if="{{isFinished && showSaveForm}}" class="save-section card">
-    <text class="section-label">记录涂药信息</text>
-    <view class="form-group">
-      <text class="form-label">药膏名称</text>
-      <input class="form-input" placeholder="如：氧化锌软膏" value="{{medicineName}}" bindinput="onMedicineInput" />
-    </view>
-    <view class="form-group">
-      <text class="form-label">涂药部位</text>
-      <input class="form-input" placeholder="如：臀部" value="{{bodyArea}}" bindinput="onAreaInput" />
-    </view>
-    <view class="form-group dim">
-      <text class="form-label">护理时长</text>
-      <text class="form-value">{{duration}} 秒（约 {{duration / 60}} 分钟）</text>
-    </view>
-    <view class="save-actions">
-      <button class="btn-save" bindtap="saveRecord">保存到用药记录</button>
-      <button class="btn-skip" bindtap="skipSave">跳过</button>
+  <view wx:if="{{isFinished && showSaveForm}}" class="save-section">
+    <view class="save-card">
+      <text class="save-title">记录涂药信息</text>
+      <view class="form-group">
+        <text class="form-label">药膏名称</text>
+        <input class="form-input" placeholder="如：氧化锌软膏" value="{{medicineName}}" bindinput="onMedicineInput" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">涂药部位</text>
+        <input class="form-input" placeholder="如：臀部" value="{{bodyArea}}" bindinput="onAreaInput" />
+      </view>
+      <view class="form-summary">
+        <text class="summary-text">本次护理 <text class="summary-highlight">{{duration}}</text> 秒（约 {{duration / 60}} 分钟）</text>
+      </view>
+      <view class="save-actions">
+        <button class="btn-save" bindtap="saveRecord">保存到用药记录</button>
+        <button class="btn-skip" bindtap="skipSave">跳过</button>
+      </view>
     </view>
   </view>
 
-  <!-- 底部留白 -->
-  <view class="bottom-spacer"></view>
+  <view class="bottom-safe"></view>
 </view>

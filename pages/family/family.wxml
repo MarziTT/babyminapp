@@ -6,7 +6,9 @@
 
   <!-- 无家庭状态 -->
   <view class="empty-state" wx:elif="{{!hasFamily}}">
-    <text class="empty-icon">👨‍👩‍👧</text>
+    <view class="empty-icon-wrap">
+      <text class="empty-icon-large">👨‍👩‍👧</text>
+    </view>
     <text class="empty-title">你还未加入任何家庭</text>
     <text class="empty-desc">创建或加入一个家庭，与家人一起记录宝宝成长</text>
     <view class="empty-actions">
@@ -22,6 +24,7 @@
   <block wx:else>
     <!-- 宝宝信息卡片 -->
     <view class="baby-card">
+      <view class="baby-card-bg"></view>
       <image wx:if="{{userAvatar}}" class="baby-avatar" src="{{userAvatar}}" mode="aspectFill" />
       <image wx:elif="{{babyAvatar}}" class="baby-avatar" src="{{babyAvatar}}" mode="aspectFill" />
       <view wx:else class="baby-avatar-placeholder">
@@ -29,7 +32,13 @@
       </view>
       <view class="baby-info">
         <text class="baby-name">{{identityGreeting}}</text>
-        <text class="baby-birthday" wx:if="{{babyBirthday}}">宝宝出生: {{babyBirthday}}</text>
+        <view class="baby-meta" wx:if="{{babyBirthday}}">
+          <text class="baby-birthday">出生: {{babyBirthday}}</text>
+          <view class="baby-age-tag">
+            <text>{{babyAgeText}}</text>
+          </view>
+        </view>
+        <text class="baby-birthday" wx:elif="{{babyBirthday}}">宝宝出生: {{babyBirthday}}</text>
       </view>
     </view>
 
@@ -46,16 +55,18 @@
           bindtap="onMemberAvatarTap"
           bindlongpress="onMemberLongPress"
         >
-          <image wx:if="{{item.avatar_url}}" class="member-avatar" src="{{item.avatar_url}}" mode="aspectFill" />
-          <view wx:else class="member-avatar-placeholder-sm">
-            <text>{{item.role === 'mom' ? '👩' : item.role === 'dad' ? '👨' : '👤'}}</text>
+          <view class="member-avatar-wrap">
+            <image wx:if="{{item.avatar_url}}" class="member-avatar" src="{{item.avatar_url}}" mode="aspectFill" />
+            <view wx:else class="member-avatar-placeholder-sm">
+              <text>{{item.role === 'mom' ? '👩' : item.role === 'dad' ? '👨' : '👤'}}</text>
+            </view>
+            <view class="member-online-dot"></view>
           </view>
           <view class="member-info">
             <text class="member-name">{{item.nickname || '未命名'}}</text>
             <text class="member-role">{{item.role === 'mom' ? '妈妈' : item.role === 'dad' ? '爸爸' : item.role === 'admin' ? '管理员' : item.role === 'editor' ? '编辑者' : '查看者'}}</text>
           </view>
-          <text class="member-perm-tag" wx:if="{{item.role !== 'mom' && item.role !== 'dad'}}">{{item.role === 'admin' ? '管理员' : item.role === 'editor' ? '编辑' : '查看'}}</text>
-          <text class="member-badge" wx:if="{{item.role === myRole || item.openid === openid}}">我</text>
+          <text class="member-badge" wx:if="{{item.openid === openid}}">我</text>
         </view>
       </view>
     </view>
@@ -66,45 +77,52 @@
         <text class="section-title">我的宝宝 ({{babies.length}})</text>
         <text class="section-add" bindtap="onShowBabyForm">+ 添加</text>
       </view>
-      <view class="baby-mgmt-list">
-        <view class="baby-mgmt-item" wx:for="{{babies}}" wx:key="id">
-          <image wx:if="{{item.avatar}}" class="baby-mgmt-avatar" src="{{item.avatar}}" mode="aspectFill" />
-          <view wx:else class="baby-mgmt-placeholder {{item.gender === 'male' ? 'baby-male' : 'baby-female'}}">
-            <text>{{item.name ? item.name.charAt(0) : '宝'}}</text>
-          </view>
-          <view class="baby-mgmt-info">
-            <text class="baby-mgmt-name">{{item.name || '宝宝'}}</text>
-            <text class="baby-mgmt-birth">{{item.birthday || '未设生日'}}</text>
-            <text class="baby-mgmt-gender">{{item.gender === 'male' ? '♂ 男宝' : '♀ 女宝'}}</text>
-          </view>
-          <view class="baby-mgmt-actions">
-            <text class="baby-mgmt-edit" data-id="{{item.id}}" bindtap="onShowBabyForm">编辑</text>
-            <text class="baby-mgmt-del" data-id="{{item.id}}" bindtap="onDeleteBaby">删除</text>
+      <view class="baby-card-list">
+        <view class="baby-card-item" wx:for="{{babies}}" wx:key="id">
+          <view class="baby-card-inner">
+            <image wx:if="{{item.avatar}}" class="baby-card-avatar" src="{{item.avatar}}" mode="aspectFill" />
+            <view wx:else class="baby-card-placeholder {{item.gender === 'male' ? 'baby-male' : 'baby-female'}}">
+              <text>{{item.name ? item.name.charAt(0) : '宝'}}</text>
+            </view>
+            <text class="baby-card-name">{{item.name || '宝宝'}}</text>
+            <text class="baby-card-birth">{{item.birthday || '未设生日'}}</text>
+            <text class="baby-card-gender">{{item.gender === 'male' ? '♂ 男宝' : '♀ 女宝'}}</text>
+            <view class="baby-card-actions">
+              <text class="baby-card-edit" data-id="{{item.id}}" bindtap="onShowBabyForm">编辑</text>
+              <text class="baby-card-del" data-id="{{item.id}}" bindtap="onDeleteBaby">删除</text>
+            </view>
           </view>
         </view>
         <view wx:if="{{babies.length === 0}}" class="empty-hint">还没有宝宝，点击上方「+ 添加」</view>
       </view>
     </view>
 
-    <!-- 家庭码 -->
-    <view class="section">
+    <!-- 家庭码 - 邀请卡风格 -->
+    <view class="section invite-section">
       <text class="section-title">我的家庭码</text>
-      <view class="code-card">
-        <text class="code-text">{{familyId}}</text>
-        <button class="copy-btn" bindtap="onCopyCode">复制</button>
+      <view class="invite-card">
+        <view class="invite-card-top">
+          <text class="invite-label">邀请码</text>
+          <text class="invite-code">{{familyId}}</text>
+        </view>
+        <view class="invite-card-divider"></view>
+        <view class="invite-card-bottom">
+          <text class="invite-desc">将此邀请码分享给家人</text>
+          <text class="invite-desc-sub">对方输入此码即可加入家庭</text>
+          <button class="invite-copy-btn" bindtap="onCopyCode">复制邀请码</button>
+        </view>
       </view>
-      <text class="code-hint">将家庭码分享给家人，对方可凭此码加入家庭</text>
     </view>
 
     <!-- 家庭切换 -->
     <view class="section">
       <view class="join-link" bindtap="onShowJoin">
-        <text class="join-link-text">加入家庭</text>
+        <text class="join-link-text">加入其他家庭</text>
         <text class="join-link-arrow">›</text>
       </view>
     </view>
 
-    <!-- 退出登录 / 退出体验模式 -->
+    <!-- 退出登录 -->
     <view class="section">
       <view class="logout-link" bindtap="onLogout">
         <text class="logout-link-text">{{isDemo ? '退出体验模式' : '退出登录'}}</text>

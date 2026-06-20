@@ -1,6 +1,59 @@
 var { createFamily, joinFamily, getFamilyMembers, getBabies, createBaby, updateBaby, deleteBaby, getFamilyPermissions, updateFamilyPermissions, uploadAvatar } = require('../../utils/api')
 var { getOpenId, getFamilyId, setFamilyId, getMyRole, setMyRole, getActiveBaby, setActiveBaby, isDemoUser } = require('../../utils/baby')
 
+/**
+ * 根据生日计算年龄描述文本
+ * birthday: "YYYY-MM-DD" 格式
+ * today: Date 对象
+ */
+function calcBabyAgeText(birthday, today) {
+  if (!birthday) return ''
+  var parts = birthday.split('-')
+  if (parts.length !== 3) return ''
+  var birthYear = parseInt(parts[0])
+  var birthMonth = parseInt(parts[1])
+  var birthDay = parseInt(parts[2])
+  if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDay)) return ''
+
+  var nowYear = today.getFullYear()
+  var nowMonth = today.getMonth() + 1
+  var nowDay = today.getDate()
+
+  // 计算总月份差
+  var totalMonths = (nowYear - birthYear) * 12 + (nowMonth - birthMonth)
+  if (nowDay < birthDay) totalMonths -= 1
+
+  if (totalMonths < 0) return '即将出生'
+
+  var years = Math.floor(totalMonths / 12)
+  var months = totalMonths % 12
+
+  // 计算天数差（从上次月整点）
+  var lastMonthYear = nowYear
+  var lastMonthMonth = nowMonth - 1
+  if (lastMonthMonth === 0) {
+    lastMonthYear -= 1
+    lastMonthMonth = 12
+  }
+  var daysInLastMonth = new Date(lastMonthYear, lastMonthMonth, 0).getDate()
+  var cmpDay = Math.min(birthDay, daysInLastMonth)
+  var refDate = new Date(lastMonthYear, lastMonthMonth - 1, cmpDay)
+  var diffDays = Math.floor((today - refDate) / (1000 * 60 * 60 * 24))
+  if (diffDays < 0) diffDays = 0
+
+  if (years > 0) {
+    return months > 0 ? years + '岁' + months + '个月' : years + '岁'
+  } else if (months > 0) {
+    return diffDays > 0 ? months + '个月' + diffDays + '天' : months + '个月'
+  } else {
+    // 计算总天数
+    var birthDate = new Date(birthYear, birthMonth - 1, birthDay)
+    var totalDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24))
+    if (totalDays < 0) totalDays = 0
+    return totalDays + '天'
+  }
+}
+
 Page({
   data: {
     openid: '',
@@ -10,6 +63,7 @@ Page({
     babyAvatar: '',
     userAvatar: '',
     identityGreeting: '宝宝',
+    babyAgeText: '',
     myRole: '',
     members: [],
     hasFamily: false,
@@ -68,6 +122,10 @@ Page({
         var babyName = res.babyName || '宝宝'
         var roleLabel = myRole === 'mom' ? '妈妈' : myRole === 'dad' ? '爸爸' : ''
         var identityGreeting = roleLabel ? babyName + '的' + roleLabel : babyName
+        var babyBirthday = res.babyBirthday || ''
+
+        // 计算年龄
+        var ageText = calcBabyAgeText(babyBirthday, new Date())
 
         // 从家庭成员列表中取自己的头像
         var members = res.members || []
@@ -78,7 +136,6 @@ Page({
             break
           }
         }
-        // 回退到本地 userInfo
         if (!userAvatar) {
           var userInfo = wx.getStorageSync('userInfo')
           if (userInfo && userInfo.avatarUrl) userAvatar = userInfo.avatarUrl
@@ -87,10 +144,11 @@ Page({
         self.setData({
           familyId: res.familyId,
           babyName: babyName,
-          babyBirthday: res.babyBirthday || '',
+          babyBirthday: babyBirthday,
           babyAvatar: res.babyAvatar || '',
           userAvatar: userAvatar,
           identityGreeting: identityGreeting,
+          babyAgeText: ageText,
           myRole: myRole,
           members: members,
           babies: res.babies || [],
@@ -284,7 +342,6 @@ Page({
     this.setData({ babyFormGender: e.currentTarget.dataset.gender })
   },
 
-  // 宝宝头像：拍照或相册
   onBabyFormAvatarTap: function () {
     var self = this
     wx.chooseImage({
@@ -306,7 +363,6 @@ Page({
     })
   },
 
-  // 提交宝宝表单（添加/修改）
   onSubmitBaby: function () {
     var self = this
 
@@ -347,7 +403,6 @@ Page({
     }
   },
 
-  // 删除宝宝
   onDeleteBaby: function (e) {
     var self = this
     var babyId = e.currentTarget.dataset.id
@@ -388,7 +443,6 @@ Page({
         wx.showLoading({ title: '上传中...' })
         uploadAvatar(filePath).then(function (data) {
           wx.hideLoading()
-          // 头像上传成功，重新加载家庭成员信息
           self.loadFamily()
           wx.showToast({ title: '头像已更新', icon: 'success' })
         }).catch(function (err) {
@@ -399,44 +453,89 @@ Page({
     })
   },
 
-  // ========== 权限管理（长按成员） ==========
+  // ========== 权限管理 / 移除成员（长按） ==========
 
   onMemberLongPress: function (e) {
     var openid = e.currentTarget.dataset.openid
     var role = e.currentTarget.dataset.role
     var nickname = e.currentTarget.dataset.nickname
 
-    if (this.data.myRole !== 'admin' && this.data.myRole !== 'mom') {
-      wx.showToast({ title: '只有管理员可以修改权限', icon: 'none' })
-      return
-    }
     if (openid === getOpenId()) {
-      wx.showToast({ title: '不能修改自己的权限', icon: 'none' })
+      wx.showToast({ title: '不能操作自己', icon: 'none' })
       return
     }
 
     var self = this
+    var isAdmin = self.data.myRole === 'admin' || self.data.myRole === 'mom'
     var roleLabel = role === 'admin' ? '管理员' : role === 'editor' ? '编辑者' : '查看者'
-    wx.showActionSheet({
-      itemList: ['设为管理员', '设为编辑者', '设为查看者', '取消'],
-      success: function (res) {
-        var newRole = null
-        if (res.tapIndex === 0) newRole = 'admin'
-        else if (res.tapIndex === 1) newRole = 'editor'
-        else if (res.tapIndex === 2) newRole = 'viewer'
-        else return
 
-        if (newRole === role) {
-          wx.showToast({ title: '已是该权限', icon: 'none' })
-          return
+    // 管理员和普通成员的菜单不同
+    if (isAdmin) {
+      wx.showActionSheet({
+        itemList: ['设为管理员', '设为编辑者', '设为查看者', '移除成员'],
+        success: function (res) {
+          if (res.tapIndex === 0) {
+            var newRole = 'admin'
+            if (newRole === role) { wx.showToast({ title: '已是该权限', icon: 'none' }); return }
+            self.updateMemberRole(openid, newRole)
+          } else if (res.tapIndex === 1) {
+            var newRole = 'editor'
+            if (newRole === role) { wx.showToast({ title: '已是该权限', icon: 'none' }); return }
+            self.updateMemberRole(openid, newRole)
+          } else if (res.tapIndex === 2) {
+            var newRole = 'viewer'
+            if (newRole === role) { wx.showToast({ title: '已是该权限', icon: 'none' }); return }
+            self.updateMemberRole(openid, newRole)
+          } else if (res.tapIndex === 3) {
+            self.removeMember(openid, nickname)
+          }
         }
+      })
+    } else {
+      wx.showToast({ title: '只有管理员可以管理成员', icon: 'none' })
+    }
+  },
 
-        updateFamilyPermissions(self.data.familyId, openid, newRole, getOpenId()).then(function () {
-          wx.showToast({ title: '权限已更新', icon: 'success' })
-          self.loadFamily()
-        }).catch(function (err) {
-          wx.showToast({ title: err.message || '修改失败', icon: 'none' })
-        })
+  updateMemberRole: function (targetOpenid, newRole) {
+    var self = this
+    updateFamilyPermissions(self.data.familyId, targetOpenid, newRole, getOpenId()).then(function () {
+      wx.showToast({ title: '权限已更新', icon: 'success' })
+      self.loadFamily()
+    }).catch(function (err) {
+      wx.showToast({ title: err.message || '修改失败', icon: 'none' })
+    })
+  },
+
+  removeMember: function (targetOpenid, nickname) {
+    var self = this
+    wx.showModal({
+      title: '移除成员',
+      content: '确定将「' + (nickname || '该成员') + '」移出家庭吗？移除后对方将无法查看家庭信息。',
+      success: function (res) {
+        if (res.confirm) {
+          // 尝试调用后端移除成员接口；若未实现则提示
+          wx.request({
+            url: 'https://your-api-domain.com/api/family/member/remove',
+            method: 'POST',
+            data: {
+              familyId: self.data.familyId,
+              targetOpenid: targetOpenid
+            },
+            header: { 'Content-Type': 'application/json' },
+            success: function (res) {
+              if (res.statusCode === 200 && res.data && res.data.success) {
+                wx.showToast({ title: '已移除', icon: 'success' })
+                self.loadFamily()
+              } else {
+                wx.showToast({ title: res.data.message || '移除失败', icon: 'none' })
+              }
+            },
+            fail: function () {
+              // 后端接口未就绪时的回退提示
+              wx.showToast({ title: '移除成员功能需后端支持，请联系开发者', icon: 'none', duration: 2500 })
+            }
+          })
+        }
       }
     })
   },
@@ -452,14 +551,12 @@ Page({
       content: isDemo ? '退出后将返回登录页，可使用微信账号登录' : '退出后需重新授权登录，确定退出吗？',
       success: function (res) {
         if (res.confirm) {
-          // 清除所有本地缓存
           wx.removeStorageSync('userInfo')
           wx.removeStorageSync('babycare_openid')
           wx.removeStorageSync('babycare_family_id')
           wx.removeStorageSync('babycare_my_role')
           wx.removeStorageSync('babycare_active_baby')
           wx.removeStorageSync('babycare_baby_info')
-          // 清除 app 全局缓存
           var app = getApp()
           if (app) {
             app.globalData.activeBaby = null

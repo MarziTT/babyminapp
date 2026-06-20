@@ -15,7 +15,9 @@ Page({
     bodyArea: '',
     showSaveForm: false,
     minDisplay: '00',
-    secDisplay: '00'
+    secDisplay: '00',
+    ringDeg: 0,
+    ringOpacity: 0
   },
 
   _intervalId: null,
@@ -45,7 +47,9 @@ Page({
       selectedPreset: index,
       customMinutes: '',
       isFinished: false,
-      showSaveForm: false
+      showSaveForm: false,
+      ringDeg: 0,
+      ringOpacity: 0
     })
     this.setDisplayFromDuration()
     this.clearTimer()
@@ -61,7 +65,9 @@ Page({
         remaining: seconds,
         selectedPreset: -1,
         isFinished: false,
-        showSaveForm: false
+        showSaveForm: false,
+        ringDeg: 0,
+        ringOpacity: 0
       })
       this.setDisplayFromDuration()
       this.clearTimer()
@@ -99,7 +105,9 @@ Page({
       isRunning: false,
       isPaused: false,
       isFinished: false,
-      showSaveForm: false
+      showSaveForm: false,
+      ringDeg: 0,
+      ringOpacity: 0
     })
     this.setDisplayFromDuration()
   },
@@ -117,10 +125,16 @@ Page({
     var remaining = Math.max(0, Math.ceil(this._initialRemaining - elapsed))
     var disp = this.secToDisplay(remaining)
 
+    // 进度环旋转角度: 90deg(0%) → 450deg(100%)
+    var progress = this._initialRemaining > 0 ? 1 - (remaining / this._initialRemaining) : 0
+    var deg = 90 + progress * 360
+
     this.setData({
       remaining: remaining,
       minDisplay: disp.min,
-      secDisplay: disp.sec
+      secDisplay: disp.sec,
+      ringDeg: deg,
+      ringOpacity: 1
     })
 
     if (remaining <= 0) {
@@ -130,7 +144,7 @@ Page({
 
   finishTimer: function () {
     this.clearTimer()
-    this.setData({ isRunning: false, isFinished: true, remaining: 0 })
+    this.setData({ isRunning: false, isFinished: true, remaining: 0, ringDeg: 450, ringOpacity: 1 })
 
     wx.vibrateLong({
       success: function () {},
