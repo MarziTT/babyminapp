@@ -1,0 +1,91 @@
+<view class="container">
+  <!-- 当前播放状态 -->
+  <view class="now-playing">
+    <view class="playing-icon">{{currentSound ? currentSound.icon : '🎵'}}</view>
+    <text class="playing-name">{{currentSound ? currentSound.name : '选择声音'}}</text>
+    <text class="playing-status" wx:if="{{isPlaying}}">播放中</text>
+    <text class="playing-status paused" wx:elif="{{currentSound}}">已暂停</text>
+    <text class="playing-status paused" wx:else>未选择</text>
+  </view>
+
+  <!-- 播放控制 -->
+  <view class="player-controls">
+    <button class="btn-play {{isPlaying ? 'playing' : ''}}" bindtap="togglePlay" disabled="{{!currentSound}}">
+      {{isPlaying ? '⏸' : '▶️'}}
+    </button>
+  </view>
+
+  <!-- 音量控制 -->
+  <view class="volume-control">
+    <text class="volume-label">🔈</text>
+    <slider class="volume-slider" min="0" max="100" value="{{volume}}" 
+            bindchange="onVolumeChange" activeColor="#D4786B" block-size="20"/>
+    <text class="volume-label">🔊</text>
+  </view>
+
+  <!-- 定时关闭 -->
+  <view class="timer-control">
+    <view class="timer-row" bindtap="enableTimer" wx:if="{{!timerEnabled}}">
+      <text class="timer-icon">⏰</text>
+      <text class="timer-text">定时关闭</text>
+      <text class="timer-arrow">›</text>
+    </view>
+    <view class="timer-row active" wx:if="{{timerEnabled}}">
+      <text class="timer-icon">⏰</text>
+      <text class="timer-countdown">{{timerRemaining > 0 ? formatCountdown(timerRemaining) : '即将关闭'}}</text>
+      <text class="timer-cancel" bindtap="disableTimer">取消</text>
+    </view>
+  </view>
+
+  <!-- 定时选择弹层 -->
+  <view class="timer-picker-mask" wx:if="{{showTimerPicker}}" bindtap="cancelTimerPicker">
+    <view class="timer-picker-card" catchtap="">
+      <text class="picker-title">定时关闭</text>
+      <view class="picker-options">
+        <view class="picker-option {{timerMinutes === 15 ? 'active' : ''}}" data-minutes="15" bindtap="onTimerMinutesChange">15分钟</view>
+        <view class="picker-option {{timerMinutes === 30 ? 'active' : ''}}" data-minutes="30" bindtap="onTimerMinutesChange">30分钟</view>
+        <view class="picker-option {{timerMinutes === 45 ? 'active' : ''}}" data-minutes="45" bindtap="onTimerMinutesChange">45分钟</view>
+        <view class="picker-option {{timerMinutes === 60 ? 'active' : ''}}" data-minutes="60" bindtap="onTimerMinutesChange">60分钟</view>
+        <view class="picker-option {{timerMinutes === 90 ? 'active' : ''}}" data-minutes="90" bindtap="onTimerMinutesChange">90分钟</view>
+        <view class="picker-option {{timerMinutes === 120 ? 'active' : ''}}" data-minutes="120" bindtap="onTimerMinutesChange">120分钟</view>
+      </view>
+      <view class="picker-actions">
+        <button class="btn-cancel" bindtap="cancelTimerPicker">取消</button>
+        <button class="btn-confirm" bindtap="confirmTimer">确认</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载错误提示 -->
+  <view class="load-error" wx:if="{{loadError}}">
+    <text class="error-text">音频生成失败，请重试或切换声音</text>
+  </view>
+
+  <!-- 分类 Tab -->
+  <view class="category-tabs">
+    <view class="tab {{activeCategory === item.key ? 'active' : ''}}"
+          wx:for="{{categories}}" wx:key="key"
+          data-key="{{item.key}}" bindtap="switchCategory">
+      {{item.name}}
+    </view>
+  </view>
+
+  <!-- 声音列表 -->
+  <view class="sound-list">
+    <block wx:for="{{filteredSounds()}}" wx:key="id">
+      <view class="sound-item {{currentSound && currentSound.id === item.id ? 'active' : ''}}"
+            data-id="{{item.id}}" bindtap="selectSound">
+        <text class="sound-icon">{{item.icon}}</text>
+        <view class="sound-info">
+          <text class="sound-name">{{item.name}}</text>
+          <text class="sound-desc">{{item.desc}}</text>
+        </view>
+        <view class="sound-play-icon" wx:if="{{currentSound && currentSound.id === item.id && isPlaying}}">
+          <view class="equalizer">
+            <view class="bar"></view><view class="bar"></view><view class="bar"></view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

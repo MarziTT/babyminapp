@@ -1,0 +1,213 @@
+<!-- 智能助手 — 纯对话流 -->
+<view class="container">
+  <!-- 消息列表 -->
+  <scroll-view class="chat-list" scroll-y scroll-into-view="{{scrollIntoView}}" scroll-with-animation>
+    <view class="chat-list-inner">
+    <block wx:for="{{messages}}" wx:key="id">
+      <view class="msg-row {{item.role === 'user' ? 'msg-user' : 'msg-ai'}}" id="{{item.id}}">
+        <!-- AI 头像在左 -->
+        <view class="msg-avatar avatar-ai" wx:if="{{item.role === 'ai'}}">
+          <text class="avatar-text">🧸</text>
+        </view>
+        <!-- 消息气泡 -->
+        <view class="msg-bubble {{item.role === 'user' ? 'bubble-user' : 'bubble-ai'}}">
+          <text class="msg-text">{{item.text}}</text>
+        </view>
+        <!-- 用户头像在右 -->
+        <view class="msg-avatar avatar-user" wx:if="{{item.role === 'user'}}">
+          <text class="avatar-text">👤</text>
+        </view>
+      </view>
+
+      <!-- 确认卡片 -->
+      <view class="confirm-card" wx:if="{{item.hasCard && !item.cardConfirmed}}">
+        <text class="card-title">确认 {{item.cardLabel}} 记录</text>
+        <view class="card-fields">
+          <!-- 喂奶 -->
+          <block wx:if="{{item.cardType === 'feeding'}}">
+            <view class="field-row">
+              <text class="field-label">方式</text>
+              <view class="side-options">
+                <view class="side-opt {{item.cardData.side === 'left' ? 'side-opt-active' : ''}}" data-msgid="{{item.id}}" data-side="left" bindtap="onCardSideSelect">左侧</view>
+                <view class="side-opt {{item.cardData.side === 'right' ? 'side-opt-active' : ''}}" data-msgid="{{item.id}}" data-side="right" bindtap="onCardSideSelect">右侧</view>
+                <view class="side-opt {{item.cardData.side === 'bottle' ? 'side-opt-active' : ''}}" data-msgid="{{item.id}}" data-side="bottle" bindtap="onCardSideSelect">瓶喂</view>
+              </view>
+            </view>
+            <view class="field-row">
+              <text class="field-label">奶量</text>
+              <input class="field-input" type="digit" value="{{item.cardData._amount_text || ''}}" placeholder="{{item.cardData.amount_ml || ''}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="amount_ml"/>
+              <text class="field-unit">ml</text>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData.start_time}}">
+              <text class="field-label">时间</text>
+              <input class="field-input" value="{{item.cardData._time_display || item.cardData.start_time}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="start_time"/>
+            </view>
+            <!-- 时长（折叠） -->
+            <view class="field-row" wx:if="{{item.cardData._showDuration}}">
+              <text class="field-label">时长</text>
+            </view>
+            <view class="preset-row" wx:if="{{item.cardData._showDuration}}">
+              <text class="preset-btn {{item.cardData.duration_minutes === 5 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="5">5分钟</text>
+              <text class="preset-btn {{item.cardData.duration_minutes === 10 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="10">10分钟</text>
+              <text class="preset-btn {{item.cardData.duration_minutes === 15 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="15">15分钟</text>
+              <text class="preset-btn {{item.cardData.duration_minutes === 20 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="20">20分钟</text>
+              <text class="preset-btn {{item.cardData.duration_minutes === 30 ? 'preset-active' : ''}}" bindtap="onCardDurationPreset" data-msgid="{{item.id}}" data-value="30">30分钟</text>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData._showDuration}}">
+              <input class="field-input" type="digit" value="{{item.cardData._duration_text || ''}}" placeholder="或输入自定义" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="duration_minutes"/>
+              <text class="field-unit">分钟</text>
+            </view>
+            <!-- 备注（折叠） -->
+            <view class="field-row" wx:if="{{item.cardData._showNote}}">
+              <text class="field-label">备注</text>
+            </view>
+            <view class="preset-row" wx:if="{{item.cardData._showNote}}">
+              <text class="preset-btn {{item.cardData._noteChip === '正常' ? 'preset-active' : ''}}" bindtap="onCardNoteChip" data-msgid="{{item.id}}" data-idx="0">正常</text>
+              <text class="preset-btn {{item.cardData._noteChip === '溢奶' ? 'preset-active' : ''}}" bindtap="onCardNoteChip" data-msgid="{{item.id}}" data-idx="1">溢奶</text>
+              <text class="preset-btn {{item.cardData._noteChip === '胃口不好' ? 'preset-active' : ''}}" bindtap="onCardNoteChip" data-msgid="{{item.id}}" data-idx="2">胃口不好</text>
+              <text class="preset-btn {{item.cardData._noteChip === '闹着吃' ? 'preset-active' : ''}}" bindtap="onCardNoteChip" data-msgid="{{item.id}}" data-idx="3">闹着吃</text>
+              <text class="preset-btn {{item.cardData._noteChip === '吃着睡着' ? 'preset-active' : ''}}" bindtap="onCardNoteChip" data-msgid="{{item.id}}" data-idx="4">吃着睡着</text>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData._showNote}}">
+              <input class="field-input" value="{{item.cardData._customNote || ''}}" placeholder="或输入自定义备注" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="_customNote"/>
+            </view>
+            <view class="expand-row" wx:if="{{!item.cardData._showDuration || !item.cardData._showNote}}">
+              <text class="expand-link" wx:if="{{!item.cardData._showDuration}}" data-msgid="{{item.id}}" data-field="_showDuration" bindtap="onCardToggleField">+ 添加时长</text>
+              <text class="expand-link" wx:if="{{!item.cardData._showNote}}" data-msgid="{{item.id}}" data-field="_showNote" bindtap="onCardToggleField">+ 添加备注</text>
+            </view>
+          </block>
+          <!-- 睡眠 -->
+          <block wx:elif="{{item.cardType === 'sleep'}}">
+            <view class="field-row">
+              <text class="field-label">时长</text>
+              <input class="field-input" type="digit" value="{{item.cardData._duration_text || ''}}" placeholder="0" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="duration_minutes"/>
+              <text class="field-unit">分钟</text>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData.start_time}}">
+              <text class="field-label">开始</text>
+              <input class="field-input" value="{{item.cardData._time_display || item.cardData.start_time}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="start_time"/>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData.end_time}}">
+              <text class="field-label">结束</text>
+              <input class="field-input" value="{{item.cardData._end_time_display || item.cardData.end_time}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="end_time"/>
+            </view>
+          </block>
+          <!-- 尿布 -->
+          <block wx:elif="{{item.cardType === 'diaper'}}">
+            <view class="field-row">
+              <text class="field-label">类型</text>
+              <view class="side-options">
+                <view class="side-opt {{item.cardData.diaper_type === 'wet' ? 'side-opt-active' : ''}}" data-msgid="{{item.id}}" data-dtype="wet" bindtap="onCardDiaperSelect">湿</view>
+                <view class="side-opt {{item.cardData.diaper_type === 'dry' ? 'side-opt-active' : ''}}" data-msgid="{{item.id}}" data-dtype="dry" bindtap="onCardDiaperSelect">干</view>
+                <view class="side-opt {{item.cardData.diaper_type === 'mixed' ? 'side-opt-active' : ''}}" data-msgid="{{item.id}}" data-dtype="mixed" bindtap="onCardDiaperSelect">混合</view>
+              </view>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData.time}}">
+              <text class="field-label">时间</text>
+              <input class="field-input" value="{{item.cardData._time_display || item.cardData.time}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="time"/>
+            </view>
+          </block>
+          <!-- 成长 -->
+          <block wx:elif="{{item.cardType === 'growth'}}">
+            <view class="field-row" wx:if="{{item.cardData.height_cm !== undefined}}">
+              <text class="field-label">身高</text>
+              <input class="field-input" type="digit" value="{{item.cardData._height_text || ''}}" placeholder="0" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="height_cm"/>
+              <text class="field-unit">cm</text>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData.weight_kg !== undefined}}">
+              <text class="field-label">体重</text>
+              <input class="field-input" type="digit" value="{{item.cardData._weight_text || ''}}" placeholder="0" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="weight_kg"/>
+              <text class="field-unit">kg</text>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData.head_circumference_cm !== undefined}}">
+              <text class="field-label">头围</text>
+              <input class="field-input" type="digit" value="{{item.cardData._head_text || ''}}" placeholder="0" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="head_circumference_cm"/>
+              <text class="field-unit">cm</text>
+            </view>
+          </block>
+          <!-- 用药 -->
+          <block wx:elif="{{item.cardType === 'medication'}}">
+            <view class="field-row">
+              <text class="field-label">药品</text>
+              <input class="field-input" value="{{item.cardData.medicine_name || ''}}" placeholder="药品名" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="medicine_name"/>
+            </view>
+            <view class="field-row">
+              <text class="field-label">剂量</text>
+              <input class="field-input" value="{{item.cardData.dosage || ''}}" placeholder="0" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="dosage"/>
+              <input class="field-input-short" value="{{item.cardData.unit || ''}}" placeholder="单位" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="unit"/>
+            </view>
+            <view class="field-row" wx:if="{{item.cardData.start_time}}">
+              <text class="field-label">时间</text>
+              <input class="field-input" value="{{item.cardData._time_display || item.cardData.start_time}}" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="start_time"/>
+            </view>
+          </block>
+          <!-- 疫苗 -->
+          <block wx:elif="{{item.cardType === 'vaccination'}}">
+            <view class="field-row">
+              <text class="field-label">疫苗</text>
+              <input class="field-input" value="{{item.cardData.vaccine_name || ''}}" placeholder="疫苗名称" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="vaccine_name"/>
+            </view>
+          </block>
+          <!-- 随手记 -->
+          <block wx:elif="{{item.cardType === 'note'}}">
+            <view class="field-row">
+              <input class="field-input-note" value="{{item.cardData.text || ''}}" placeholder="记录内容" bindinput="onCardFieldInput" data-msgid="{{item.id}}" data-field="text"/>
+            </view>
+          </block>
+        </view>
+        <view class="card-actions">
+          <button class="btn-cancel" bindtap="onCardCancel" data-msgid="{{item.id}}">取消</button>
+          <button class="btn-confirm" bindtap="onCardConfirm" data-msgid="{{item.id}}" disabled="{{item.cardSaving}}">
+            {{item.cardSaving ? '保存中' : '确认保存'}}
+          </button>
+        </view>
+      </view>
+
+      <!-- 已确认标记 -->
+      <view class="confirm-done" wx:if="{{item.hasCard && item.cardConfirmed === true}}">
+        <text class="done-icon">✓</text>
+        <text class="done-text">已保存</text>
+      </view>
+      <view class="confirm-done cancelled" wx:elif="{{item.hasCard && item.cardConfirmed === 'cancelled'}}">
+        <text class="done-text">已取消</text>
+      </view>
+    </block>
+
+    <!-- 加载动画 -->
+    <view class="msg-row msg-ai" wx:if="{{loading}}">
+      <view class="msg-avatar avatar-ai">
+        <text class="avatar-text">🧸</text>
+      </view>
+      <view class="msg-bubble bubble-ai typing">
+        <text class="typing-dot">●</text>
+        <text class="typing-dot">●</text>
+        <text class="typing-dot">●</text>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view class="chat-spacer"></view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入栏 -->
+  <view class="input-bar">
+    <view class="input-divider"></view>
+    <view class="input-inner">
+    <view class="input-row">
+      <input
+        class="text-input"
+        value="{{inputText}}"
+        placeholder="记录或提问..."
+        bindinput="onInput"
+        bindconfirm="onSend"
+        confirm-type="send"
+        adjust-position="{{true}}"
+        hold-keyboard="{{true}}"
+        maxlength="200"
+      />
+      <button class="send-btn" bindtap="onSend" disabled="{{!inputText || loading}}">发送</button>
+    </view>
+    </view>
+  </view>
+</view>

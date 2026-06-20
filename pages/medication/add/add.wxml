@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="header">
+    <text class="title">添加用药记录</text>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">药品名称</text>
+    <input class="form-input" placeholder="如 布洛芬混悬液" value="{{medicineName}}" bindinput="onNameInput"/>
+  </view>
+
+  <view class="metric-row">
+    <view class="metric-item" style="flex:2">
+      <text class="input-label">剂量</text>
+      <input class="form-input" type="digit" placeholder="如 2.5" value="{{dosage}}" bindinput="onDosageInput"/>
+    </view>
+    <view class="metric-item" style="flex:1">
+      <text class="input-label">单位</text>
+      <input class="form-input" placeholder="ml" value="{{unit}}" bindinput="onUnitInput"/>
+    </view>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">用药频率</text>
+    <picker mode="selector" range="{{freqOptions}}" bindchange="onFrequencySelect">
+      <view class="form-picker">{{frequency || '请选择用药频率'}}</view>
+    </picker>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">备注</text>
+    <textarea class="note-input" placeholder="选填：用药原因、注意事项等" value="{{note}}" bindinput="onNoteInput" maxlength="200"/>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit">保存记录</button>
+</view>

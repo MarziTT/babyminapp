@@ -1,0 +1,265 @@
+/**
+ * 语音录入页 — 温润极简
+ */
+
+.container {
+  padding: var(--space-lg) var(--space-md) calc(120rpx + env(safe-area-inset-bottom));
+  min-height: 100vh;
+  text-align: center;
+}
+
+/* 标题 */
+.page-title {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  display: block;
+  letter-spacing: -0.5rpx;
+}
+
+.page-desc {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-2xl);
+}
+
+/* 输入区域 */
+.input-area {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+}
+
+.text-input {
+  flex: 1;
+  height: 96rpx;
+  padding: 0 var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-full);
+  font-size: var(--font-md);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.text-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.send-btn {
+  flex-shrink: 0;
+  width: 140rpx;
+  height: 88rpx;
+  border-radius: var(--radius-full);
+  font-size: var(--font-md);
+  font-weight: 600;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  border: none;
+  box-shadow: 0 4rpx 16rpx rgba(212, 120, 107, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.send-btn:active {
+  background: var(--color-primary-dark);
+  transform: scale(0.97);
+}
+
+.send-btn[disabled] {
+  background: var(--color-border);
+  color: var(--text-tertiary);
+  box-shadow: none;
+}
+
+.mic-btn {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 107, 0.3);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.mic-btn:active {
+  transform: scale(0.9);
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 107, 0.2);
+}
+
+.mic-icon {
+  font-size: 36rpx;
+}
+
+.mic-hint {
+  text-align: center;
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-sm);
+}
+
+/* 示例 */
+.examples {
+  text-align: left;
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.examples-title {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+.example-item {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+  padding: 10rpx var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+}
+
+.example-item:active {
+  background: var(--color-bg);
+  color: var(--color-primary);
+}
+
+/* 结果区 */
+.result-area {
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+
+.result-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+}
+
+.result-text {
+  font-size: var(--font-md);
+  color: var(--text-primary);
+  display: block;
+  margin-top: var(--space-xs);
+  font-weight: 600;
+}
+
+.parsing-hint {
+  font-size: var(--font-sm);
+  color: var(--color-primary);
+  margin-top: var(--space-sm);
+  display: block;
+}
+
+/* 确认卡片 */
+.confirm-card {
+  margin-top: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.confirm-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.confirm-fields {
+  text-align: left;
+  margin-bottom: var(--space-lg);
+}
+
+.confirm-fields text {
+  display: block;
+  font-size: var(--font-md);
+  color: var(--text-secondary);
+  padding: 8rpx 0;
+}
+
+.missing-hint {
+  font-size: var(--font-md);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.time-text {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.btn-edit,
+.btn-cancel-card,
+.btn-confirm {
+  flex: 1;
+  height: 88rpx;
+  border-radius: var(--radius-full);
+  font-size: var(--font-md);
+  font-weight: 600;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: var(--color-bg);
+  color: var(--text-secondary);
+}
+
+.btn-edit:active {
+  background: var(--color-border);
+}
+
+.btn-cancel-card {
+  background: var(--color-bg);
+  color: var(--text-tertiary);
+}
+
+.btn-cancel-card:active {
+  background: var(--color-border);
+}
+
+.btn-confirm {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  box-shadow: 0 4rpx 16rpx rgba(212, 120, 107, 0.25);
+}
+
+.btn-confirm:active {
+  background: var(--color-primary-dark);
+  transform: scale(0.97);
+}
+
+.btn-confirm[disabled] {
+  background: var(--color-border);
+  color: var(--text-tertiary);
+  box-shadow: none;
+}

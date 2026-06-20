@@ -1,0 +1,52 @@
+<view class="container">
+  <view class="header">
+    <text class="title">疫苗接种</text>
+    <text class="add-btn" bindtap="goAdd">+ 添加</text>
+  </view>
+
+  <!-- 接种计划折叠区 -->
+  <view class="schedule-toggle" bindtap="toggleSchedule">
+    <text class="schedule-toggle-text">接种计划 (当前{{currentMonthAge}}月龄)</text>
+    <text class="schedule-toggle-arrow">{{showSchedule ? '▲' : '▼'}}</text>
+  </view>
+
+  <view class="schedule-card" wx:if="{{showSchedule}}">
+    <view class="schedule-item {{item.isCurrent ? 'current' : ''}} {{item.isPast ? 'past' : ''}}" wx:for="{{schedule}}" wx:key="month">
+      <view class="schedule-header">
+        <text class="schedule-age">{{item.label}}</text>
+        <text class="schedule-badge" wx:if="{{item.isCurrent}}">当前</text>
+      </view>
+      <view class="schedule-vaccines">
+        <view class="vaccine-row {{v.done ? 'done' : ''}}" wx:for="{{item.vaccineItems}}" wx:for-item="v" wx:key="name">
+          <text class="vaccine-check">{{v.done ? '✓' : '○'}}</text>
+          <text class="vaccine-name">{{v.name}}</text>
+          <text class="vaccine-quick-add" wx:if="{{!v.done && item.isCurrent}}" data-name="{{v.name}}" catchtap="quickAddVaccine">+添加</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tab 切换 -->
+  <scroll-view scroll-x class="tab-bar">
+    <view class="tab {{activeTab === item.key ? 'active' : ''}}" wx:for="{{tabs}}" wx:key="key" data-key="{{item.key}}" bindtap="switchTab">
+      <text>{{item.label}}</text>
+      <text class="tab-count" wx:if="{{item.count > 0}}">{{item.count}}</text>
+    </view>
+  </scroll-view>
+
+  <view class="list" wx:if="{{records.length > 0}}">
+    <view class="item" wx:for="{{records}}" wx:key="id" data-id="{{item.id}}" data-status="{{item.status}}" bindlongpress="onLongPress">
+      <view class="item-body">
+        <text class="item-name">{{item.vaccine_name}}</text>
+        <text class="item-date">{{item.displayTime || '未计划'}}</text>
+        <text class="status-tag {{item.status}}">{{item.statusLabel}}</text>
+        <text class="item-recorder" wx:if="{{item.recorded_by_name}}">{{item.recorded_by_name}}记录</text>
+      </view>
+      <text class="delete-btn" catchtap="deleteRecord" data-id="{{item.id}}">✕</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text>暂无疫苗记录</text>
+  </view>
+</view>

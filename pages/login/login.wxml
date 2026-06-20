@@ -1,0 +1,28 @@
+<view class="login-container">
+  <view class="login-header">
+    <text class="app-name">BabyCare</text>
+    <text class="app-desc">登录后即可记录宝宝成长数据</text>
+  </view>
+
+  <view class="login-body">
+    <button
+      class="login-btn"
+      open-type="getUserInfo"
+      bindgetuserinfo="onGetUserInfo"
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      <text class="login-btn-text">{{loading ? '登录中…' : '微信一键登录'}}</text>
+    </button>
+
+    <text class="login-error" wx:if="{{error}}">{{error}}</text>
+
+    <view class="login-skip" bindtap="onSkip">
+      <text class="skip-text">跳过登录，体验模式</text>
+    </view>
+  </view>
+
+  <view class="login-footer">
+    <text class="footer-text">你的数据仅存储在你自己加入的家庭中</text>
+  </view>
+</view>

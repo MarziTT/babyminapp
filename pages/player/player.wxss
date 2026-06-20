@@ -1,0 +1,380 @@
+/* ==================== 设计系统变量（与 timer 统一） ==================== */
+page {
+  --brand-primary: #D4786B;
+  --brand-primary-light: #E8A99D;
+  --brand-bg: #FBF7F4;
+  --brand-card: #FFFFFF;
+  --text-primary: #3D2C2A;
+  --text-secondary: #8B7D7A;
+  --text-muted: #B5A8A4;
+  --border-light: #EDE7E3;
+  --shadow-card: 0 2px 12px rgba(61, 44, 42, 0.06);
+  --shadow-elevated: 0 4px 20px rgba(61, 44, 42, 0.1);
+  --radius-lg: 20rpx;
+  --radius-xl: 28rpx;
+  --radius-round: 50%;
+
+  background-color: var(--brand-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+.container {
+  padding: 40rpx 32rpx 120rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ==================== 当前播放状态 ==================== */
+.now-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 0 32rpx;
+}
+
+.playing-icon {
+  font-size: 72rpx;
+  margin-bottom: 16rpx;
+}
+
+.playing-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8rpx;
+}
+
+.playing-status {
+  font-size: 26rpx;
+  color: var(--brand-primary);
+  background: rgba(212, 120, 107, 0.1);
+  padding: 4rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.playing-status.paused {
+  color: var(--text-muted);
+  background: rgba(181, 168, 164, 0.12);
+}
+
+/* ==================== 播放控制按钮 ==================== */
+.player-controls {
+  display: flex;
+  justify-content: center;
+  padding: 16rpx 0 32rpx;
+}
+
+.btn-play {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: var(--radius-round);
+  background: var(--brand-primary);
+  color: #FFFFFF;
+  font-size: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  box-shadow: 0 6rpx 24rpx rgba(212, 120, 107, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.btn-play::after {
+  border: none;
+}
+
+.btn-play:active {
+  transform: scale(0.94);
+}
+
+.btn-play[disabled] {
+  background: var(--border-light);
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+/* ==================== 音量控制 ==================== */
+.volume-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 48rpx 24rpx;
+  gap: 16rpx;
+}
+
+.volume-label {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.volume-slider {
+  flex: 1;
+  max-width: 400rpx;
+}
+
+/* ==================== 定时关闭 ==================== */
+.timer-control {
+  padding: 0 48rpx 32rpx;
+}
+
+.timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-card);
+  border-radius: var(--radius-lg);
+  padding: 20rpx 28rpx;
+  box-shadow: var(--shadow-card);
+  gap: 12rpx;
+}
+
+.timer-row.active {
+  border: 2rpx solid var(--brand-primary-light);
+}
+
+.timer-icon {
+  font-size: 32rpx;
+}
+
+.timer-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.timer-arrow {
+  font-size: 32rpx;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.timer-countdown {
+  font-size: 28rpx;
+  color: var(--brand-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-cancel {
+  font-size: 26rpx;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* ==================== 定时选择弹层 ==================== */
+.timer-picker-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-picker-card {
+  background: var(--brand-card);
+  border-radius: var(--radius-xl);
+  padding: 40rpx 32rpx 28rpx;
+  width: 560rpx;
+  box-shadow: var(--shadow-elevated);
+}
+
+.picker-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  text-align: center;
+  margin-bottom: 28rpx;
+}
+
+.picker-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 28rpx;
+}
+
+.picker-option {
+  flex: 0 0 calc(33.333% - 12rpx);
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: var(--radius-lg);
+  background: var(--brand-bg);
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+
+.picker-option.active {
+  background: rgba(212, 120, 107, 0.12);
+  color: var(--brand-primary);
+  font-weight: 600;
+}
+
+.picker-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.btn-cancel, .btn-confirm {
+  flex: 1;
+  padding: 20rpx 0;
+  border-radius: var(--radius-lg);
+  font-size: 28rpx;
+  border: none;
+  text-align: center;
+}
+
+.btn-cancel {
+  background: var(--brand-bg);
+  color: var(--text-secondary);
+}
+
+.btn-confirm {
+  background: var(--brand-primary);
+  color: #FFFFFF;
+}
+
+.btn-cancel::after, .btn-confirm::after {
+  border: none;
+}
+
+/* ==================== 加载错误 ==================== */
+.load-error {
+  text-align: center;
+  padding: 16rpx 0;
+}
+
+.error-text {
+  font-size: 24rpx;
+  color: var(--brand-primary);
+  background: rgba(212, 120, 107, 0.08);
+  padding: 10rpx 24rpx;
+  border-radius: 16rpx;
+}
+
+/* ==================== 分类 Tab ==================== */
+.category-tabs {
+  display: flex;
+  justify-content: center;
+  padding: 8rpx 0 24rpx;
+  gap: 12rpx;
+}
+
+.tab {
+  padding: 14rpx 36rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  background: var(--brand-card);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-card);
+}
+
+.tab.active {
+  background: var(--brand-primary);
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 16rpx rgba(212, 120, 107, 0.3);
+}
+
+/* ==================== 声音列表 ==================== */
+.sound-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.sound-item {
+  display: flex;
+  align-items: center;
+  background: var(--brand-card);
+  border-radius: var(--radius-lg);
+  padding: 24rpx 28rpx;
+  box-shadow: var(--shadow-card);
+  border-left: 6rpx solid transparent;
+  transition: all 0.2s ease;
+  gap: 20rpx;
+}
+
+.sound-item.active {
+  border-left-color: var(--brand-primary);
+  background: rgba(212, 120, 107, 0.03);
+}
+
+.sound-item:active {
+  transform: scale(0.98);
+}
+
+.sound-icon {
+  font-size: 44rpx;
+  flex-shrink: 0;
+  width: 64rpx;
+  text-align: center;
+}
+
+.sound-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sound-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.sound-desc {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==================== 均衡器动画 ==================== */
+.sound-play-icon {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 4rpx;
+  height: 32rpx;
+}
+
+.equalizer .bar {
+  width: 5rpx;
+  background: var(--brand-primary);
+  border-radius: 3rpx;
+  animation: eq-anim 0.8s ease-in-out infinite alternate;
+}
+
+.equalizer .bar:nth-child(1) {
+  height: 16rpx;
+  animation-delay: 0s;
+}
+
+.equalizer .bar:nth-child(2) {
+  height: 28rpx;
+  animation-delay: 0.15s;
+}
+
+.equalizer .bar:nth-child(3) {
+  height: 20rpx;
+  animation-delay: 0.3s;
+}
+
+@keyframes eq-anim {
+  0% { height: 6rpx; }
+  100% { height: 100%; }
+}

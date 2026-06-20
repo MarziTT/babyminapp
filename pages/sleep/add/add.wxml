@@ -1,0 +1,53 @@
+<!-- 添加睡眠记录 -->
+<view class="container">
+  <!-- 实时记录入口 -->
+  <view class="timer-entry" wx:if="{{!isEdit}}" bindtap="goTimer">
+    <text class="timer-entry-icon">⏱</text>
+    <text class="timer-entry-label">实时记录</text>
+    <text class="timer-entry-sub">点击开始计时宝宝睡眠</text>
+  </view>
+
+  <!-- 时间选择器 (手动录入模式) -->
+  <view wx:if="{{showTimePickers}}">
+    <view class="input-group">
+      <text class="input-label">开始时间</text>
+      <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+        <view class="picker-box">{{startDate || '选择日期'}}</view>
+      </picker>
+      <picker mode="time" value="{{startTimeVal}}" bindchange="onStartTimeChange">
+        <view class="picker-box">{{startTimeVal || '选择时间'}}</view>
+      </picker>
+    </view>
+
+    <view class="input-group">
+      <text class="input-label">结束时间</text>
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+        <view class="picker-box">{{endDate || '选择日期'}}</view>
+      </picker>
+      <picker mode="time" value="{{endTimeVal}}" bindchange="onEndTimeChange">
+        <view class="picker-box">{{endTimeVal || '选择时间'}}</view>
+      </picker>
+    </view>
+
+    <view class="duration-hint" wx:if="{{durationMinutes > 0}}">
+      <text>预估时长：{{durationMinutes}} 分钟</text>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="note-section">
+    <text class="input-label">备注</text>
+    <view class="note-chips">
+      <text class="note-chip {{selectedNote === item ? 'active' : ''}}" 
+            wx:for="{{noteOptions}}" wx:key="*this" 
+            bindtap="onToggleNote" data-idx="{{index}}">{{item}}</text>
+      <text class="note-chip-custom {{showCustomInput ? 'active' : ''}}" bindtap="toggleCustomInput">+ 自定义</text>
+    </view>
+    <input wx:if="{{showCustomInput}}" class="custom-note-input" 
+           placeholder="输入自定义备注" placeholder-style="color:#B8A99E;font-size:30rpx;" value="{{customNote}}" 
+           bindinput="onCustomNoteInput" maxlength="100"/>
+  </view>
+
+  <!-- 提交 -->
+  <button class="submit-btn" bindtap="onSubmit">保存记录</button>
+</view>

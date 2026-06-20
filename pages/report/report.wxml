@@ -1,0 +1,113 @@
+<!-- AI 分析报告 -->
+<view class="container">
+  <view class="top-bar">
+  <text class="page-title">AI 分析报告</text>
+  <text class="export-btn" bindtap="onExportData">导出数据</text>
+</view>
+
+  <!-- 周期切换 -->
+  <view class="period-tabs">
+    <view class="period-tab {{periodIndex === index ? 'active' : ''}}"
+      wx:for="{{periods}}" wx:key="index" bindtap="switchPeriod" data-index="{{index}}">
+      {{item}}
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{isLoading}}">
+    <text class="loading-text">AI 正在分析数据...</text>
+  </view>
+
+  <!-- 报告内容 -->
+  <view class="report-body" wx:if="{{report && !isLoading}}">
+
+    <!-- 喂养分析 -->
+    <view class="section">
+      <text class="section-title">🍼 喂养</text>
+      <view class="stat-row" wx:if="{{report.feeding_summary.daily_avg_count}}">
+        <text class="stat-label">日均喂养</text>
+        <text class="stat-value">{{report.feeding_summary.daily_avg_count}} 次 / {{report.feeding_summary.daily_avg_ml || 0}} ml</text>
+      </view>
+      <text class="trend-text" wx:if="{{report.feeding_summary.trend}}">{{report.feeding_summary.trend}}</text>
+    </view>
+
+    <!-- 睡眠分析 -->
+    <view class="section">
+      <text class="section-title">😴 睡眠</text>
+      <view class="stat-row" wx:if="{{report.sleep_summary.daily_avg_hours}}">
+        <text class="stat-label">日均睡眠</text>
+        <text class="stat-value">{{report.sleep_summary.daily_avg_hours}} 小时</text>
+      </view>
+      <text class="trend-text" wx:if="{{report.sleep_summary.trend}}">{{report.sleep_summary.trend}}</text>
+    </view>
+
+    <!-- 尿布分析 -->
+    <view class="section">
+      <text class="section-title">🧷 尿布</text>
+      <view class="stat-row" wx:if="{{report.diaper_summary.daily_avg_count}}">
+        <text class="stat-label">日均换</text>
+        <text class="stat-value">{{report.diaper_summary.daily_avg_count}} 次</text>
+      </view>
+      <text class="trend-text" wx:if="{{report.diaper_summary.trend}}">{{report.diaper_summary.trend}}</text>
+    </view>
+
+    <!-- 成长分析 -->
+    <view class="section" wx:if="{{report.growth_summary && report.growth_summary.latest_height_cm}}">
+      <text class="section-title">📏 成长</text>
+      <view class="stat-row">
+        <text class="stat-label">最新身高</text>
+        <text class="stat-value">{{report.growth_summary.latest_height_cm}} cm</text>
+      </view>
+      <view class="stat-row" wx:if="{{report.growth_summary.latest_weight_kg}}">
+        <text class="stat-label">最新体重</text>
+        <text class="stat-value">{{report.growth_summary.latest_weight_kg}} kg</text>
+      </view>
+      <text class="trend-text" wx:if="{{report.growth_summary.trend}}">{{report.growth_summary.trend}}</text>
+    </view>
+
+    <!-- 疫苗分析 -->
+    <view class="section" wx:if="{{report.vaccination_summary && report.vaccination_summary.total}}">
+      <text class="section-title">💉 疫苗</text>
+      <view class="stat-row">
+        <text class="stat-label">已完成</text>
+        <text class="stat-value">{{report.vaccination_summary.completed || 0}} / {{report.vaccination_summary.total}}</text>
+      </view>
+      <text class="trend-text" wx:if="{{report.vaccination_summary.trend}}">{{report.vaccination_summary.trend}}</text>
+    </view>
+
+    <!-- 用药分析 -->
+    <view class="section" wx:if="{{report.medication_summary && report.medication_summary.total_records}}">
+      <text class="section-title">💊 用药</text>
+      <view class="stat-row">
+        <text class="stat-label">用药次数</text>
+        <text class="stat-value">{{report.medication_summary.total_records}} 次</text>
+      </view>
+      <text class="trend-text" wx:if="{{report.medication_summary.trend}}">{{report.medication_summary.trend}}</text>
+    </view>
+
+    <!-- 随手记分析 -->
+    <view class="section" wx:if="{{report.note_summary && report.note_summary.total_notes}}">
+      <text class="section-title">📝 随手记</text>
+      <view class="stat-row">
+        <text class="stat-label">记录条数</text>
+        <text class="stat-value">{{report.note_summary.total_notes}} 条</text>
+      </view>
+      <text class="trend-text" wx:if="{{report.note_summary.trend}}">{{report.note_summary.trend}}</text>
+    </view>
+
+    <!-- AI 建议 -->
+    <view class="section suggestions" wx:if="{{report.suggestions && report.suggestions.length}}">
+      <text class="section-title">💡 建议</text>
+      <view class="suggestion-item" wx:for="{{report.suggestions}}" wx:key="index">
+        <text class="suggestion-num">{{index + 1}}.</text>
+        <text class="suggestion-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!isLoading && !hasData}}">
+    <text class="empty-text">记录更多宝宝数据，AI 会为你生成分析报告</text>
+    <text class="empty-sub">首页可快速录入喂养、睡眠、尿布、成长等数据</text>
+  </view>
+</view>

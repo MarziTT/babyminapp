@@ -1,0 +1,49 @@
+.container { padding: var(--space-md); min-height: 100vh; padding-bottom: 120rpx; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); }
+.title { font-size: var(--font-2xl); font-weight: 800; }
+.add-btn { font-size: var(--font-md); color: var(--color-primary); padding: var(--space-xs) var(--space-md); background: var(--color-primary-light); border-radius: var(--radius-full); }
+
+/* 接种计划 */
+.schedule-toggle { display: flex; justify-content: space-between; align-items: center; padding: var(--space-md); background: var(--color-surface); border-radius: var(--radius-md); margin-bottom: var(--space-sm); box-shadow: var(--shadow-sm); }
+.schedule-toggle-text { font-size: var(--font-md); font-weight: 600; color: var(--color-primary); }
+.schedule-toggle-arrow { font-size: var(--font-sm); color: var(--text-tertiary); }
+
+.schedule-card { background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--space-md); margin-bottom: var(--space-md); box-shadow: var(--shadow-sm); }
+.schedule-item { padding: var(--space-sm) 0; border-bottom: 1rpx solid var(--color-divider); }
+.schedule-item:last-child { border-bottom: none; }
+.schedule-item.current { background: var(--color-primary-light); border-radius: var(--radius-md); padding: var(--space-sm) var(--space-sm); margin: var(--space-xs) -var(--space-sm); }
+.schedule-item.past { opacity: 0.5; }
+.schedule-header { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-xs); }
+.schedule-age { font-size: var(--font-sm); font-weight: 700; color: var(--text-primary); }
+.schedule-badge { font-size: 20rpx; color: var(--color-primary); background: var(--color-accent); padding: 2rpx 12rpx; border-radius: var(--radius-full); font-weight: 600; }
+.schedule-vaccines { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.vaccine-row { display: flex; align-items: center; gap: 6rpx; padding: 4rpx 12rpx; background: var(--color-bg); border-radius: var(--radius-sm); }
+.vaccine-row.done { opacity: 0.6; }
+.vaccine-check { font-size: var(--font-xs); color: var(--color-accent); }
+.vaccine-row.done .vaccine-check { color: var(--color-accent); }
+.vaccine-name { font-size: var(--font-xs); color: var(--text-primary); }
+.vaccine-quick-add { font-size: 20rpx; color: var(--color-primary); padding: 2rpx 8rpx; background: var(--color-primary-light); border-radius: var(--radius-full); }
+.vaccine-quick-add:active { opacity: 0.7; }
+
+/* Tab */
+.tab-bar { display: flex; white-space: nowrap; margin-bottom: var(--space-md); }
+.tab { display: inline-flex; align-items: center; gap: 6rpx; padding: 12rpx 28rpx; border-radius: var(--radius-full); font-size: var(--font-sm); color: var(--text-secondary); background: var(--color-surface); margin-right: var(--space-sm); box-shadow: var(--shadow-sm); font-weight: 500; }
+.tab.active { background: var(--color-primary); color: var(--text-inverse); font-weight: 600; }
+.tab-count { font-size: 20rpx; background: rgba(255,255,255,0.25); color: inherit; padding: 2rpx 10rpx; border-radius: var(--radius-full); }
+.tab.active .tab-count { background: rgba(255,255,255,0.3); }
+
+/* 列表 */
+.list { }
+.item { display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-sm); box-shadow: var(--shadow-sm); }
+.item-body { flex: 1; display: flex; align-items: center; gap: var(--space-md); }
+.item-name { font-size: var(--font-md); font-weight: 600; color: var(--text-primary); flex: 1; }
+.item-date { font-size: var(--font-sm); color: var(--text-secondary); }
+.status-tag { font-size: var(--font-xs); padding: 4rpx 16rpx; border-radius: var(--radius-full); font-weight: 600; }
+.status-tag.upcoming { background: #FFF3E0; color: #E65100; }
+.status-tag.completed { background: #E8F5E9; color: #2E7D32; }
+.status-tag.skipped { background: #F5F5F5; color: #9E9E9E; }
+.item-recorder { font-size: 20rpx; color: #AAA; background: rgba(0,0,0,0.04); padding: 2rpx 10rpx; border-radius: 8rpx; margin-left: auto; }
+.delete-btn { font-size: 32rpx; color: var(--color-primary); padding: var(--space-xs) var(--space-sm); }
+.delete-btn:active { transform: scale(0.85); }
+
+.empty { text-align: center; padding: var(--space-2xl) 0; color: var(--text-tertiary); font-size: var(--font-md); }

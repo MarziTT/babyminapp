@@ -1,0 +1,29 @@
+/**
+ * 睡眠记录列表 — 温润极简
+ */
+.container { padding: var(--space-md); min-height: 100vh; padding-bottom: 120rpx; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md); }
+.title { font-size: var(--font-2xl); font-weight: 800; }
+.header-actions { display: flex; gap: var(--space-sm); align-items: center; }
+.add-btn { font-size: var(--font-md); color: var(--color-primary); padding: var(--space-xs) var(--space-md); background: var(--color-primary-light); border-radius: var(--radius-full); }
+.date-switcher { display: flex; justify-content: center; align-items: center; gap: var(--space-lg); padding: var(--space-xs) 0 var(--space-md); }
+.date-arrow { font-size: var(--font-lg); color: var(--text-secondary); padding: var(--space-xs) var(--space-sm); }
+.date-arrow:active { color: var(--color-primary); }
+.date-text { font-size: var(--font-lg); font-weight: 700; color: var(--text-primary); min-width: 160rpx; text-align: center; }
+
+/* 实时记录入口 */
+.realtime-btn { display: flex; flex-direction: column; align-items: center; padding: var(--space-lg); margin-bottom: var(--space-md); background: linear-gradient(135deg, #E8F0FE, #D0E2FF); border-radius: var(--radius-lg); border: 2rpx dashed var(--color-primary); }
+.realtime-icon { font-size: 40rpx; margin-bottom: var(--space-xs); }
+.realtime-label { font-size: var(--font-lg); font-weight: 700; color: var(--color-primary); margin-bottom: 4rpx; }
+.realtime-sub { font-size: var(--font-xs); color: var(--text-secondary); }
+
+.item { display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-sm); box-shadow: var(--shadow-sm); }
+.item-body { flex: 1; display: flex; justify-content: space-between; align-items: center; }
+.item-left { display: flex; flex-direction: column; gap: 4rpx; }
+.item-time { font-size: var(--font-xs); color: var(--text-tertiary); }
+.item-duration { font-size: var(--font-xl); font-weight: 700; color: var(--color-primary); }
+.item-note { font-size: var(--font-sm); color: var(--text-secondary); }
+.item-recorder { font-size: 20rpx; color: #AAA; background: rgba(0,0,0,0.04); padding: 2rpx 10rpx; border-radius: 8rpx; margin-left: auto; }
+.delete-btn { font-size: 32rpx; color: var(--color-primary); padding: var(--space-xs) var(--space-sm); }
+.delete-btn:active { transform: scale(0.85); }
+.empty { text-align: center; padding: var(--space-2xl) 0; color: var(--text-tertiary); font-size: var(--font-md); }

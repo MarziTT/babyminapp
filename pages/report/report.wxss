@@ -1,0 +1,185 @@
+/**
+ * AI 分析报告页 — 温润极简
+ * 数据仪表盘风格，大数字 + 柔和分区
+ */
+
+.container {
+  padding: var(--space-md) var(--space-md) calc(120rpx + env(safe-area-inset-bottom));
+  min-height: 100vh;
+}
+
+/* 顶部栏 */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+/* 标题 */
+.page-title {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5rpx;
+}
+
+/* 导出按钮 */
+.export-btn {
+  font-size: var(--font-sm);
+  color: var(--color-primary);
+  padding: 10rpx 28rpx;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.export-btn:active {
+  opacity: 0.75;
+  transform: scale(0.95);
+}
+
+/* 周期切换 Tabs */
+.period-tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.period-tab {
+  padding: 12rpx 32rpx;
+  border-radius: var(--radius-full);
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s;
+  font-weight: 500;
+}
+
+.period-tab.active {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  font-weight: 700;
+  box-shadow: 0 6rpx 20rpx rgba(212, 120, 107, 0.25);
+}
+
+.period-tab:active {
+  transform: scale(0.95);
+}
+
+/* 加载中 */
+.loading {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.loading-text {
+  font-size: var(--font-md);
+  color: var(--color-primary);
+  font-weight: 500;
+  display: block;
+}
+
+/* 分区卡片 */
+.section {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.section-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.3rpx;
+}
+
+/* 统计数据行 */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid var(--color-divider);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  font-size: var(--font-md);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* 趋势文字 */
+.trend-text {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-top: var(--space-sm);
+}
+
+/* AI 建议区 */
+.suggestions {
+  background: var(--color-accent-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.suggestion-item {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 10rpx 0;
+  align-items: flex-start;
+}
+
+.suggestion-num {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-accent);
+  min-width: 32rpx;
+  flex-shrink: 0;
+}
+
+.suggestion-text {
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* 空态 */
+.empty {
+  text-align: center;
+  padding: var(--space-2xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.empty-text {
+  font-size: var(--font-md);
+  color: var(--text-tertiary);
+}
+
+.empty-sub {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+}

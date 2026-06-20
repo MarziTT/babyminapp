@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="header">
+    <text class="title">添加成长记录</text>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">记录日期</text>
+    <picker mode="date" value="{{recordDate}}" end="{{recordDate}}" bindchange="onDateChange">
+      <view class="form-picker">{{recordDate}}</view>
+    </picker>
+  </view>
+
+  <view class="metric-row">
+    <view class="metric-item">
+      <text class="input-label">身高 (cm)</text>
+      <input class="form-input" type="digit" placeholder="如 65.5" value="{{heightCm}}" bindinput="onHeightInput"/>
+    </view>
+    <view class="metric-item">
+      <text class="input-label">体重 (kg)</text>
+      <input class="form-input" type="digit" placeholder="如 7.2" value="{{weightKg}}" bindinput="onWeightInput"/>
+    </view>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">头围 (cm)</text>
+    <input class="form-input" type="digit" placeholder="选填" value="{{headCm}}" bindinput="onHeadInput"/>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">备注</text>
+    <textarea class="note-input" placeholder="选填：宝宝状态等" value="{{note}}" bindinput="onNoteInput" maxlength="200"/>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit">保存记录</button>
+</view>

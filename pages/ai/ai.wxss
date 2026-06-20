@@ -1,0 +1,180 @@
+/**
+ * AI 育儿顾问页 — 温润极简对话
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-bg);
+}
+
+/* 消息列表 */
+.msg-list {
+  flex: 1;
+  padding: var(--space-md);
+  overflow-y: auto;
+}
+
+.msg-item {
+  display: flex;
+  margin-bottom: var(--space-md);
+  align-items: flex-start;
+}
+
+.msg-item.user {
+  flex-direction: row-reverse;
+}
+
+.msg-avatar {
+  font-size: 40rpx;
+  margin: 0 var(--space-sm);
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* 气泡 */
+.msg-bubble {
+  max-width: 72%;
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  line-height: 1.6;
+}
+
+.msg-bubble.assistant {
+  background: var(--color-surface);
+  border-top-left-radius: var(--radius-sm);
+}
+
+.msg-bubble.user {
+  background: var(--color-primary);
+  border-top-right-radius: var(--radius-sm);
+}
+
+.msg-bubble.user .msg-text {
+  color: var(--text-inverse);
+}
+
+.msg-text {
+  font-size: var(--font-md);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.msg-time {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: var(--space-xs);
+}
+
+.msg-bubble.user .msg-time {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 打字指示器 */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: var(--color-primary);
+  opacity: 0.3;
+  animation: dotPulse 1.4s infinite;
+}
+
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+  0%, 60% { opacity: 0.2; transform: scale(0.8); }
+  100% { opacity: 0.8; transform: scale(1); }
+}
+
+/* 快捷提问 */
+.quick-asks {
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  background: var(--color-surface);
+  border-top: 1rpx solid var(--color-divider);
+}
+
+.quick-btn {
+  font-size: var(--font-xs);
+  padding: 10rpx 22rpx;
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  color: var(--color-primary);
+  font-weight: 500;
+  transition: all 0.2s;
+  border: none;
+}
+
+.quick-btn:active {
+  background: var(--color-primary-light);
+  transform: scale(0.95);
+}
+
+/* 输入栏 */
+.input-bar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border-top: 1rpx solid var(--color-divider);
+  gap: var(--space-sm);
+  padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+}
+
+.msg-input {
+  flex: 1;
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-md);
+  color: var(--text-primary);
+  height: 72rpx;
+  box-sizing: border-box;
+}
+
+.send-btn {
+  width: 120rpx;
+  height: 72rpx;
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(212, 120, 107, 0.25);
+  transition: all 0.2s;
+}
+
+.send-btn:active {
+  background: var(--color-primary-dark);
+  transform: scale(0.95);
+}
+
+.send-btn[disabled] {
+  background: var(--color-border);
+  color: var(--text-tertiary);
+  box-shadow: none;
+}

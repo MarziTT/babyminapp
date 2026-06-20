@@ -1,0 +1,46 @@
+<!-- 添加尿布记录 -->
+<view class="container">
+  <!-- 类型切换 -->
+  <view class="type-switch">
+    <view class="type-item {{diaperType === 'wet' ? 'active' : ''}}" bindtap="switchType" data-type="wet">
+      <text class="type-icon">💧</text>
+      <text>尿尿</text>
+    </view>
+    <view class="type-item {{diaperType === 'dry' ? 'active' : ''}}" bindtap="switchType" data-type="dry">
+      <text class="type-icon">💩</text>
+      <text>便便</text>
+    </view>
+    <view class="type-item {{diaperType === 'mixed' ? 'active' : ''}}" bindtap="switchType" data-type="mixed">
+      <text class="type-icon">🔄</text>
+      <text>都有</text>
+    </view>
+  </view>
+
+  <!-- 时间 -->
+  <view class="input-group">
+    <text class="input-label">时间</text>
+    <picker mode="date" value="{{recordDate}}" bindchange="onDateChange">
+      <view class="picker-box">{{recordDate || '选择日期'}}</view>
+    </picker>
+    <picker mode="time" value="{{recordTime}}" bindchange="onTimeChange">
+      <view class="picker-box">{{recordTime || '选择时间'}}</view>
+    </picker>
+  </view>
+
+  <!-- 备注 -->
+  <view class="note-section">
+    <text class="input-label">备注</text>
+    <view class="note-chips">
+      <text class="note-chip {{selectedNote === item ? 'active' : ''}}" 
+            wx:for="{{noteOptions}}" wx:key="*this" 
+            bindtap="onToggleNote" data-idx="{{index}}">{{item}}</text>
+      <text class="note-chip-custom {{showCustomInput ? 'active' : ''}}" bindtap="toggleCustomInput">+ 自定义</text>
+    </view>
+    <input wx:if="{{showCustomInput}}" class="custom-note-input" 
+           placeholder="输入自定义备注" placeholder-style="color:#B8A99E;font-size:30rpx;" value="{{customNote}}" 
+           bindinput="onCustomNoteInput" maxlength="100"/>
+  </view>
+
+  <!-- 提交 -->
+  <button class="submit-btn" bindtap="onSubmit">保存记录</button>
+</view>

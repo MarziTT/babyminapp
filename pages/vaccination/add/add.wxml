@@ -1,0 +1,24 @@
+<view class="container">
+  <view class="header">
+    <text class="title">添加接种提醒</text>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">疫苗名称</text>
+    <input class="form-input" placeholder="如 乙肝疫苗第2针" value="{{vaccineName}}" bindinput="onNameInput"/>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">计划日期</text>
+    <picker mode="date" value="{{scheduledDate}}" bindchange="onDateChange">
+      <view class="form-picker">{{scheduledDate}}</view>
+    </picker>
+  </view>
+
+  <view class="input-group">
+    <text class="input-label">备注</text>
+    <textarea class="note-input" placeholder="选填：接种地点、注意事项等" value="{{note}}" bindinput="onNoteInput" maxlength="200"/>
+  </view>
+
+  <button class="submit-btn" bindtap="onSubmit">保存提醒</button>
+</view>

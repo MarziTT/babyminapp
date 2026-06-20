@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BabyCare Icons</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Segoe UI",sans-serif;background:linear-gradient(135deg,#0f0f23,#1a1a3e,#2d1b3d);min-height:100vh;color:#eee;padding:32px 24px}
+h1{text-align:center;font-size:24px;background:linear-gradient(135deg,#FF8C42,#FF6B6B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.sub{text-align:center;color:#888;font-size:13px;margin-bottom:28px}
+#content{max-width:700px;margin:0 auto;background:rgba(255,255,255,0.06);border-radius:20px;padding:28px;border:1px solid rgba(255,255,255,0.1)}
+.loading{text-align:center;color:#888;padding:60px 0}
+.dot{display:inline-block;width:8px;height:8px;margin:0 3px;background:#FF8C42;border-radius:50%;animation:b 1.4s infinite}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+.footer{text-align:center;margin-top:20px;color:#555;font-size:12px}
+</style></head><body>
+<h1>BabyCare Tab 图标方案</h1>
+<p class="sub">3 个 Tab：首页 · 智能助手 · 报告</p>
+<div id="content"><div class="loading"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+<div class="footer" id="status">等待推送...</div>
+<script>
+let lt=null;
+fetch("/data").then(r=>r.json()).then(d=>{if(d.html){document.getElementById("content").innerHTML=d.html;lt=d.ts}});
+setInterval(()=>{fetch("/data").then(r=>r.json()).then(d=>{if(d.html&&d.ts!==lt){lt=d.ts;document.getElementById("content").innerHTML=d.html;document.getElementById("status").textContent=d.title||"已推送"}}).catch(()=>{})},1500);
+</script></body></html>

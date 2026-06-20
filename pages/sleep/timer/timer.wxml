@@ -1,0 +1,33 @@
+<view class="page">
+  <!-- 星空背景层 -->
+  <view class="stars">
+    <view class="star" wx:for="{{12}}" wx:key="*this" style="left: {{item * 7 + 5}}%; top: {{item * 11 % 80 + 5}}%; animation-delay: {{item * 0.3}}s;"></view>
+  </view>
+
+  <!-- 月亮装饰 -->
+  <view class="moon"></view>
+
+  <!-- 返回按钮 -->
+  <view class="back-btn" bindtap="goBack">
+    <text class="back-arrow">←</text>
+  </view>
+
+  <!-- 标题 -->
+  <view class="title-area">
+    <text class="main-title">🌙 实时记录</text>
+    <text class="sub-title">{{isRunning ? '宝宝正在入睡...' : '点击开始记录宝宝睡眠'}}</text>
+  </view>
+
+  <!-- 计时器圆盘 -->
+  <view class="timer-ring {{isRunning ? 'active' : ''}}" bindtap="toggleTimer">
+    <view class="timer-inner">
+      <text class="timer-display">{{timerDisplay}}</text>
+      <text class="timer-hint">{{isRunning ? '轻触停止' : '开始计时'}}</text>
+    </view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer-hint" wx:if="{{!isRunning}}">
+    <text>停止后自动跳转保存记录</text>
+  </view>
+</view>

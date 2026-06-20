@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="header">
+    <text class="title">随手记</text>
+  </view>
+
+  <view class="form-card">
+    <view class="form-group">
+      <text class="form-label">内容</text>
+      <textarea class="form-textarea" placeholder="记录宝宝的点滴..." value="{{text}}" bindinput="onTextInput" maxlength="500" auto-height/>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">备注</text>
+      <input class="form-input" placeholder="补充说明（可选）" value="{{note}}" bindinput="onNoteInput" maxlength="200"/>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">时间</text>
+      <picker mode="time" value="{{timeDisplay}}" bindchange="onTimeChange">
+        <view class="time-picker">
+          <text class="time-text">{{timeDisplay || '选择时间'}}</text>
+          <text class="time-arrow">></text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <button class="btn-submit" bindtap="onSubmit">保存记录</button>
+</view>

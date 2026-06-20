@@ -1,0 +1,460 @@
+.container {
+  min-height: 100vh;
+  background: #F5F7FA;
+  padding: 24rpx;
+}
+
+/* 加载 */
+.loading-area {
+  display: flex;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 160rpx;
+}
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 32rpx;
+}
+.empty-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+.empty-desc {
+  font-size: 26rpx;
+  color: #999;
+  text-align: center;
+  margin-bottom: 48rpx;
+  line-height: 1.6;
+  padding: 0 40rpx;
+}
+.empty-actions {
+  display: flex;
+  gap: 24rpx;
+}
+.action-btn {
+  width: 240rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  background: #FFFFFF;
+  color: #4F8CFF;
+  border: 2rpx solid #4F8CFF;
+}
+.action-btn.primary {
+  background: #4F8CFF;
+  color: #FFFFFF;
+  border: none;
+}
+.action-btn::after {
+  border: none;
+}
+
+/* 宝宝卡片 */
+.baby-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #4F8CFF, #7CB3FF);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+.baby-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
+  border: 4rpx solid rgba(255,255,255,0.5);
+  margin-right: 24rpx;
+}
+.baby-avatar-placeholder {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
+  background: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+}
+.placeholder-emoji {
+  font-size: 48rpx;
+}
+.baby-info {
+  display: flex;
+  flex-direction: column;
+}
+.baby-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.baby-birthday {
+  font-size: 24rpx;
+  color: rgba(255,255,255,0.8);
+  margin-top: 8rpx;
+}
+
+/* 分区 */
+.section {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+/* 成员列表 */
+.member-list {
+  display: flex;
+  flex-direction: column;
+}
+.member-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+.member-item:last-child {
+  border-bottom: none;
+}
+.member-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  margin-right: 20rpx;
+}
+.member-avatar-placeholder-sm {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  background: #F0F4FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  font-size: 32rpx;
+}
+.member-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.member-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+.member-role {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+.member-badge {
+  font-size: 22rpx;
+  color: #4F8CFF;
+  background: #F0F4FF;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+}
+
+/* 家庭码 */
+.code-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F5F7FA;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+}
+.code-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #4F8CFF;
+  font-family: monospace;
+}
+.copy-btn {
+  width: 120rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  background: #4F8CFF;
+  border-radius: 28rpx;
+  border: none;
+}
+.copy-btn::after {
+  border: none;
+}
+.code-hint {
+  font-size: 22rpx;
+  color: #BBB;
+  margin-top: 12rpx;
+  display: block;
+}
+
+/* 加入链接 */
+.join-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 0;
+}
+.join-link-text {
+  font-size: 26rpx;
+  color: #4F8CFF;
+}
+.join-link-arrow {
+  font-size: 28rpx;
+  color: #4F8CFF;
+  margin-left: 4rpx;
+}
+
+/* 弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.modal-card {
+  width: 600rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 40rpx;
+}
+.modal-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #333;
+  display: block;
+  text-align: center;
+  margin-bottom: 32rpx;
+}
+.form-group {
+  margin-bottom: 24rpx;
+}
+.form-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+  display: block;
+}
+.form-input {
+  height: 80rpx;
+  background: #F5F7FA;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+.form-picker {
+  height: 80rpx;
+  line-height: 80rpx;
+  background: #F5F7FA;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+.role-row {
+  display: flex;
+  gap: 20rpx;
+}
+.role-tag {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  background: #F5F7FA;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+.role-tag.active {
+  background: #F0F4FF;
+  color: #4F8CFF;
+  border: 2rpx solid #4F8CFF;
+}
+.modal-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}
+.btn-cancel, .btn-confirm {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+}
+.btn-cancel {
+  background: #F5F7FA;
+  color: #666;
+}
+.btn-cancel::after { border: none; }
+.btn-confirm {
+  background: #4F8CFF;
+  color: #FFFFFF;
+}
+.btn-confirm::after { border: none; }
+
+.bottom-safe {
+  height: 40rpx;
+}
+
+/* ========== 宝宝管理列表 ========== */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+.section-header .section-title {
+  margin-bottom: 0;
+}
+.section-add {
+  font-size: 26rpx;
+  color: #4F8CFF;
+  font-weight: 600;
+}
+.baby-mgmt-list {
+  display: flex;
+  flex-direction: column;
+}
+.baby-mgmt-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+.baby-mgmt-item:last-child {
+  border-bottom: none;
+}
+.baby-mgmt-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  margin-right: 20rpx;
+}
+.baby-mgmt-placeholder {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  font-size: 28rpx;
+  color: #fff;
+}
+.baby-male { background: linear-gradient(135deg, #4A90D9, #357ABD); }
+.baby-female { background: linear-gradient(135deg, #F098A0, #E07080); }
+.baby-mgmt-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.baby-mgmt-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+.baby-mgmt-birth {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 2rpx;
+}
+.baby-mgmt-gender {
+  font-size: 22rpx;
+  color: #AAA;
+  margin-top: 2rpx;
+}
+.baby-mgmt-actions {
+  display: flex;
+  gap: 16rpx;
+}
+.baby-mgmt-edit {
+  font-size: 24rpx;
+  color: #4F8CFF;
+  padding: 6rpx 16rpx;
+}
+.baby-mgmt-del {
+  font-size: 24rpx;
+  color: #FF4D4F;
+  padding: 6rpx 16rpx;
+}
+.empty-hint {
+  text-align: center;
+  font-size: 24rpx;
+  color: #CCC;
+  padding: 40rpx 0;
+}
+
+/* ========== 成员权限标签 ========== */
+.member-perm-tag {
+  font-size: 20rpx;
+  color: #FF9800;
+  background: #FFF3E0;
+  padding: 2rpx 12rpx;
+  border-radius: 10rpx;
+  margin-right: 12rpx;
+}
+
+/* ========== 头像上传 ========== */
+.avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+}
+.avatar-preview {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  border: 3rpx solid #EEE;
+}
+.avatar-preview-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  background: #F5F7FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  border: 3rpx dashed #DDD;
+}
+.avatar-hint {
+  font-size: 22rpx;
+  color: #4F8CFF;
+  margin-top: 12rpx;
+}

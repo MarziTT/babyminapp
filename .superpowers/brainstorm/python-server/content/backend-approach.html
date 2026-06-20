@@ -1,0 +1,73 @@
+<h2>AI 统一调度：三种后端方案</h2>
+<p class="subtitle">用户的输入同时可能是「记录」或「问题」— AI 怎么判断并路由？</p>
+
+<div class="options">
+  <div class="option" data-choice="unified" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>统一智能端点 /api/ai/smart</h3>
+      <p>新增一个端点，AI 先判断意图 → 记录则返回解析字段，问答则返回对话文本。前端只调一个接口，逻辑最清晰，后端一次请求搞定。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="fallback" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>优先解析 → 兜底对话</h3>
+      <p>先调 voice-parse → 如果能识别出记录类型就展示确认卡；如果返回 unknown 则再调 ai-chat。改动最小，不需要新接口，但会有两次请求延迟。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="parallel" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>并行双调 + 意图权重</h3>
+      <p>同时调 voice-parse 和 ai-chat，AI 在解析结果中附带置信度。置信度高的优先展示，低的丢弃。速度最快但浪费 Token / 费用。</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px">
+  <h3>推荐方案 A：统一智能端点</h3>
+  <div class="mockup">
+    <div class="mockup-header">数据流</div>
+    <div class="mockup-body">
+      <div style="padding:20px;font-family:monospace;font-size:13px;color:#989eb1;line-height:2">
+        <div style="color:#e1e4eb">用户说: "左边喂了15分钟"</div>
+        <div style="padding-left:16px">↓</div>
+        <div style="padding-left:16px;color:#4a90d9">POST /api/ai/smart  { text: "左边喂了15分钟" }</div>
+        <div style="padding-left:32px">↓</div>
+        <div style="padding-left:32px">AI 判断意图 → <span style="color:#f0c060">record</span></div>
+        <div style="padding-left:48px">↓</div>
+        <div style="padding-left:48px;color:#4caf88">返回: { intent:"record", type:"feeding",</div>
+        <div style="padding-left:48px;color:#4caf88">  parsed:{ side:"left", duration_minutes:15 }}</div>
+        <div style="padding-left:48px">↓</div>
+        <div style="padding-left:48px">前端弹出确认卡片</div>
+
+        <div style="margin-top:20px;border-top:1px solid #1a1d27;padding-top:20px"></div>
+
+        <div style="color:#e1e4eb">用户说: "宝宝最近奶量减少了正常吗"</div>
+        <div style="padding-left:16px">↓</div>
+        <div style="padding-left:16px;color:#4a90d9">POST /api/ai/smart  { text: "宝宝最近奶量..." }</div>
+        <div style="padding-left:32px">↓</div>
+        <div style="padding-left:32px">AI 判断意图 → <span style="color:#4a90d9">chat</span></div>
+        <div style="padding-left:48px">↓</div>
+        <div style="padding-left:48px;color:#4caf88">返回: { intent:"chat",</div>
+        <div style="padding-left:48px;color:#4caf88">  reply:"奶量波动很正常..." }</div>
+        <div style="padding-left:48px">↓</div>
+        <div style="padding-left:48px">前端追加到对话流</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons">
+  <div class="pros"><h4>方案 A 优势</h4><ul>
+    <li>一次请求，无额外延迟</li>
+    <li>意图判断在后端统一处理</li>
+    <li>新增端点不影响旧接口，voice-parse 和 ai-chat 保留供 AI 顾问页使用</li>
+    <li>后端可用 system prompt 精确控制输出格式</li>
+  </ul></div>
+  <div class="cons"><h4>注意事项</h4><ul>
+    <li>需要后端新增路由 + AI prompt 工程</li>
+    <li>需推送到 GitHub + Render 部署</li>
+  </ul></div>
+</div>

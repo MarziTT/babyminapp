@@ -1,0 +1,87 @@
+<!-- 语音录入页面 -->
+<view class="container">
+  <text class="page-title">一句话录入</text>
+  <text class="page-desc">打字或用语音说出来，AI 自动识别记录</text>
+
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <view class="mic-btn" bindtap="onTapMic">
+      <text class="mic-icon">🎤</text>
+    </view>
+    <input
+      class="text-input"
+      value="{{inputText}}"
+      placeholder="打字或点🎤用语音说"
+      bindinput="onTextInput"
+      bindconfirm="onSendText"
+      confirm-type="send"
+      adjust-position="{{true}}"
+      hold-keyboard="{{true}}"
+      maxlength="200"
+    />
+    <button class="send-btn" bindtap="onSendText" disabled="{{!inputText || isParsing}}">
+      {{isParsing ? '解析中' : '发送'}}
+    </button>
+  </view>
+  <view class="mic-hint">点 🎤 后点击键盘的话筒图标开始说话</view>
+
+  <!-- 快捷例句 -->
+  <view class="examples">
+    <text class="examples-title">可以这样说：</text>
+    <view class="example-item" bindtap="onQuickExample" data-text="左边喂了15分钟">"左边喂了 15 分钟"</view>
+    <view class="example-item" bindtap="onQuickExample" data-text="瓶喂喝了120毫升">"瓶喂喝了 120 毫升"</view>
+    <view class="example-item" bindtap="onQuickExample" data-text="宝宝睡了半小时">"宝宝睡了半小时"</view>
+    <view class="example-item" bindtap="onQuickExample" data-text="换了一次尿布，是湿的">"换了一次尿布，是湿的"</view>
+  </view>
+
+  <!-- 识别文本 -->
+  <view class="result-area" wx:if="{{rawText}}">
+    <text class="result-label">你说的：</text>
+    <text class="result-text">{{rawText}}</text>
+    <view wx:if="{{isParsing}}">
+      <text class="parsing-hint">AI 正在解析...</text>
+    </view>
+  </view>
+
+  <!-- 确认卡片 -->
+  <view class="confirm-card" wx:if="{{showConfirm}}">
+    <text class="confirm-title">确认 {{confirmType}} 记录</text>
+    <view class="confirm-fields" wx:if="{{confirmType === '喂奶'}}">
+      <text wx:if="{{confirmData.side}}">方式：{{confirmData.side === 'left' ? '左侧' : confirmData.side === 'right' ? '右侧' : '瓶喂'}}</text>
+      <text wx:else class="missing-hint">请点击"确认保存"后选择喂奶方式</text>
+      <text>时长：{{confirmData.duration_minutes || 0}} 分钟</text>
+      <text wx:if="{{confirmData.amount_ml}}">奶量：{{confirmData.amount_ml}} ml</text>
+      <text wx:if="{{confirmData.start_time}}" class="time-text">时间：{{confirmData._time_display || confirmData.start_time}}</text>
+    </view>
+    <view class="confirm-fields" wx:elif="{{confirmType === '睡眠'}}">
+      <text>时长：{{confirmData.duration_minutes || 0}} 分钟</text>
+      <text wx:if="{{confirmData.start_time}}" class="time-text">开始：{{confirmData._time_display || confirmData.start_time}}</text>
+      <text wx:if="{{confirmData.end_time}}" class="time-text">结束：{{confirmData._end_time_display || confirmData.end_time}}</text>
+    </view>
+    <view class="confirm-fields" wx:elif="{{confirmType === '尿布'}}">
+      <text>类型：{{confirmData.diaper_type === 'wet' ? '湿' : confirmData.diaper_type === 'dry' ? '干' : '混合'}}</text>
+      <text wx:if="{{confirmData.time}}" class="time-text">时间：{{confirmData._time_display || confirmData.time}}</text>
+    </view>
+    <view class="confirm-fields" wx:elif="{{confirmType === '成长'}}">
+      <text wx:if="{{confirmData.height_cm}}">身高：{{confirmData.height_cm}} cm</text>
+      <text wx:if="{{confirmData.weight_kg}}">体重：{{confirmData.weight_kg}} kg</text>
+      <text wx:if="{{confirmData.head_circumference_cm}}">头围：{{confirmData.head_circumference_cm}} cm</text>
+    </view>
+    <view class="confirm-fields" wx:elif="{{confirmType === '用药'}}">
+      <text>药品/症状：{{confirmData.medicine_name}}</text>
+      <text wx:if="{{confirmData.dosage}}">剂量/体温：{{confirmData.dosage}}{{confirmData.unit}}</text>
+      <text wx:if="{{confirmData.start_time}}" class="time-text">时间：{{confirmData._time_display || confirmData.start_time}}</text>
+    </view>
+    <view class="confirm-fields" wx:elif="{{confirmType === '疫苗'}}">
+      <text>疫苗：{{confirmData.vaccine_name}}</text>
+    </view>
+    <view class="confirm-fields" wx:elif="{{confirmType === '随手记'}}">
+      <text>{{confirmData.text}}</text>
+    </view>
+    <view class="confirm-actions">
+      <button class="btn-edit" bindtap="onEdit">修改</button>
+      <button class="btn-cancel-card" bindtap="onCancelConfirm">取消</button>
+      <button class="btn-confirm" bindtap="onConfirm" disabled="{{_isSaving}}">{{_isSaving ? '保存中' : '确认保存'}}</button>
+    </view>
+  </view>
+</view>

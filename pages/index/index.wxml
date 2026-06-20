@@ -1,0 +1,143 @@
+<!-- 首页 -->
+<view class="page bg-primary">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-top">
+      <view class="greeting">
+        <text class="greeting-text">{{familyId ? '下午好' : '欢迎'}}</text>
+        <text class="baby-name">{{babyName}}</text>
+      </view>
+      <view class="header-actions">
+        <view class="header-avatar" bindtap="onGoFamily">
+          <image wx:if="{{familyId}}" class="avatar-img" src="/assets/icons/baby-avatar.png" mode="aspectFill" />
+          <text wx:else class="avatar-placeholder">👶</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提醒卡片 — 浮起 -->
+  <view wx:if="{{reminder}}" class="reminder-card {{reminder.type === 'done' ? 'reminder-card-done' : 'reminder-card-missing'}}" bindtap="onTapReminder">
+    <text class="reminder-card-icon">{{reminder.type === 'done' ? '✅' : '⏰'}}</text>
+    <text class="reminder-card-text">{{reminder.text}}</text>
+    <text wx:if="{{reminder.type === 'missing'}}" class="reminder-card-arrow">›</text>
+  </view>
+
+  <!-- 宝宝切换器 -->
+  <view wx:if="{{babies.length > 1}}" class="baby-switcher">
+    <scroll-view class="baby-list" scroll-x="true" enable-flex="true">
+      <view
+        class="baby-tag {{activeBaby.id === item.id ? 'baby-tag-active' : ''}}"
+        wx:for="{{babies}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="switchBaby"
+      >
+        <view class="baby-tag-avatar-wrap">
+          <image wx:if="{{item.avatar}}" class="baby-tag-avatar" src="{{item.avatar}}" mode="aspectFill" />
+          <view wx:else class="baby-tag-placeholder {{item.gender === 'male' ? 'baby-male' : 'baby-female'}}">
+            <text>{{item.name ? item.name.charAt(0) : '宝'}}</text>
+          </view>
+        </view>
+        <text class="baby-tag-name">{{item.name || '宝宝'}}</text>
+      </view>
+      <view class="baby-tag baby-tag-add" bindtap="onAddBaby">
+        <text class="baby-tag-add-icon">+</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 家庭未配置提示 -->
+  <view wx:if="{{noFamily}}" class="no-family-tip">
+    <text class="no-family-text">👨‍👩‍👧 还没有创建家庭，去创建一个吧</text>
+    <button class="btn-link" bindtap="onGoFamily">创建家庭</button>
+  </view>
+
+  <!-- 今日概况 + 快速补录 双卡 -->
+  <view wx:if="{{familyId}}" class="today-cards">
+    <view class="card today-summary-card">
+      <text class="card-title">今日概况</text>
+      <view class="today-grid">
+        <view class="today-item" bindtap="goToDetail" data-type="feeding">
+          <text class="today-icon">🍼</text>
+          <text class="today-count">{{todaySummary.feeding.count}}</text>
+          <text class="today-label">喂奶</text>
+          <text wx:if="{{todaySummary.feeding.amount > 0}}" class="today-sub">{{todaySummary.feeding.amount}}ml</text>
+        </view>
+        <view class="today-item" bindtap="goToDetail" data-type="sleep">
+          <text class="today-icon">😴</text>
+          <text class="today-count">{{todaySummary.sleep.count}}</text>
+          <text class="today-label">睡眠</text>
+          <text wx:if="{{todaySummary.sleep.totalSleepMinutes > 0}}" class="today-sub">{{todaySummary.sleep.totalHours > 0 ? todaySummary.sleep.totalHours + 'h ' : ''}}{{todaySummary.sleep.totalMins}}min</text>
+        </view>
+        <view class="today-item" bindtap="goToDetail" data-type="diaper">
+          <text class="today-icon">🧷</text>
+          <text class="today-count">{{todaySummary.diaper.count}}</text>
+          <text class="today-label">尿布</text>
+        </view>
+      </view>
+    </view>
+    <view class="card quick-log-card" bindtap="onQuickAction" data-page="/pages/smart/smart">
+      <text class="card-title">快速补录</text>
+      <view class="quick-log-inner">
+        <text class="quick-log-icon">🎙️</text>
+        <text class="quick-log-hint">说句话就能记</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="section-title">快捷操作</view>
+  <view class="quick-grid">
+    <view class="qg-item" wx:for="{{quickActions}}" wx:key="label" bindtap="onQuickAction" data-page="{{item.page}}">
+      <view class="qg-icon-wrap" style="background: {{item.bgColor}}">
+        <text class="qg-icon">{{item.icon}}</text>
+      </view>
+      <text class="qg-label">{{item.label}}</text>
+      <text class="qg-sub">{{item.sub}}</text>
+    </view>
+  </view>
+
+  <!-- 家庭动态时间线 -->
+  <view wx:if="{{familyId && timelineList.length > 0}}" class="section-title">家庭动态</view>
+  <view wx:if="{{familyId && timelineList.length > 0}}" class="timeline">
+    <view class="timeline-item" wx:for="{{timelineList}}" wx:key="index">
+      <view class="timeline-left">
+        <image wx:if="{{item.recordedByAvatar}}" class="timeline-avatar" src="{{item.recordedByAvatar}}" mode="aspectFill" />
+        <view wx:else class="timeline-avatar-placeholder">{{item.recordedByName ? item.recordedByName.charAt(0) : '👤'}}</view>
+        <view class="timeline-line"></view>
+      </view>
+      <view class="timeline-content">
+        <view class="timeline-header">
+          <text class="timeline-user">{{item.recordedByName || '家人'}}</text>
+          <text class="timeline-action">记录了{{item.eventType}}</text>
+        </view>
+        <text wx:if="{{item.detail}}" class="timeline-detail">{{item.detail}}</text>
+        <text class="timeline-time">{{item.time}}</text>
+      </view>
+      <text class="timeline-icon">{{item.icon}}</text>
+    </view>
+  </view>
+
+  <!-- 最近记录 -->
+  <view wx:if="{{recentRecords.length > 0}}" class="section-title">最近记录</view>
+  <view wx:if="{{recentRecords.length > 0}}" class="recent-list">
+    <view class="recent-item" wx:for="{{recentRecords}}" wx:key="index" bindtap="goToDetail" data-type="{{item.type}}">
+      <view class="recent-left">
+        <text class="recent-type-icon">{{item.type === 'feeding' ? '🍼' : item.type === 'sleep' ? '😴' : item.type === 'diaper' ? '🧷' : item.type === 'growth' ? '📏' : item.type === 'vaccination' ? '💉' : '💊'}}</text>
+        <view class="recent-info">
+          <text class="recent-type">{{item.type === 'feeding' ? '喂奶' : item.type === 'sleep' ? '睡眠' : item.type === 'diaper' ? '尿布' : item.type === 'growth' ? '成长记录' : item.type === 'vaccination' ? '疫苗接种' : '用药记录'}}</text>
+          <text class="recent-desc">{{item.data.amount_ml ? item.data.amount_ml + 'ml' : item.data.duration_minutes ? item.data.duration_minutes + '分钟' : item.data.medicine_name || item.data.vaccine_name || item.data.height_cm ? item.data.height_cm + 'cm' : ''}}</text>
+        </view>
+      </view>
+      <text class="recent-time">{{item._time}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{!familyId && !noFamily}}" class="loading-state">
+    <text>加载中…</text>
+  </view>
+
+  <!-- 底部留白 -->
+  <view class="bottom-spacer"></view>
+</view>

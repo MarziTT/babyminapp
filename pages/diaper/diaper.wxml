@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="header">
+    <text class="title">尿布记录</text>
+    <text class="add-btn" bindtap="goAdd">+ 添加</text>
+  </view>
+
+  <view class="date-switcher">
+    <text class="date-arrow" bindtap="prevDay">◀</text>
+    <picker mode="date" value="{{targetDate}}" end="{{targetDate}}" bindchange="onDateChange">
+      <text class="date-text">{{dateDisplay}}</text>
+    </picker>
+    <text class="date-arrow" bindtap="nextDay">▶</text>
+  </view>
+
+  <view class="list" wx:if="{{records.length > 0}}">
+    <view class="item" wx:for="{{records}}" wx:key="id">
+      <view class="item-body" bindtap="editRecord" data-id="{{item.id}}">
+        <view class="item-left">
+          <text class="item-type-icon">{{item.diaper_type === 'dry' ? '💩' : item.diaper_type === 'mixed' ? '🔄' : '💧'}}</text>
+          <view class="item-info">
+            <text class="item-type">{{item.diaper_type === 'dry' ? '便便' : item.diaper_type === 'mixed' ? '都有' : '尿尿'}}</text>
+            <text class="item-time">{{item.displayTime}}</text>
+          </view>
+        </view>
+        <text class="item-note" wx:if="{{item.note}}">{{item.note}}</text>
+        <text class="item-recorder" wx:if="{{item.recorded_by_name}}">{{item.recorded_by_name}}记录</text>
+      </view>
+      <text class="delete-btn" catchtap="deleteRecord" data-id="{{item.id}}">✕</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:else>
+    <text>暂无尿布记录</text>
+  </view>
+</view>

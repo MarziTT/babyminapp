@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/feeding/feeding",
+    "pages/note/add/add",
+    "pages/feeding/add/add",
+    "pages/sleep/sleep",
+    "pages/sleep/add/add",
+    "pages/sleep/timer/timer",
+    "pages/diaper/diaper",
+    "pages/diaper/add/add",
+    "pages/voice/voice",
+    "pages/ai/ai",
+    "pages/smart/smart",
+    "pages/report/report",
+    "pages/growth/growth",
+    "pages/growth/add/add",
+    "pages/vaccination/vaccination",
+    "pages/vaccination/add/add",
+    "pages/medication/medication",
+    "pages/medication/add/add",
+    "pages/report/weekly/weekly",
+    "pages/family/family",
+    "pages/timer/timer",
+    "pages/player/player"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FF8C42",
+    "navigationBarTitleText": "BabyCare",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F7FA"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#D4786B",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tabs/home.png",
+        "selectedIconPath": "images/tabs/home_active.png"
+      },
+      {
+        "pagePath": "pages/smart/smart",
+        "text": "智能助手",
+        "iconPath": "images/tabs/smart.png",
+        "selectedIconPath": "images/tabs/smart_active.png"
+      },
+      {
+        "pagePath": "pages/report/report",
+        "text": "报告",
+        "iconPath": "images/tabs/report.png",
+        "selectedIconPath": "images/tabs/report_active.png"
+      }
+    ]
+  },
+  "requiredBackgroundModes": ["audio"],
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,91 @@
+<!-- 添加喂奶记录 -->
+<view class="container">
+  <!-- 喂奶类型切换 -->
+  <view class="type-switch">
+    <view class="type-item {{feedType === 'left' ? 'active' : ''}}" bindtap="switchType" data-type="left">
+      <text class="type-icon">🤱</text>
+      <text>左侧</text>
+    </view>
+    <view class="type-item {{feedType === 'right' ? 'active' : ''}}" bindtap="switchType" data-type="right">
+      <text class="type-icon">🤱</text>
+      <text>右侧</text>
+    </view>
+    <view class="type-item {{feedType === 'bottle' ? 'active' : ''}}" bindtap="switchType" data-type="bottle">
+      <text class="type-icon">🍼</text>
+      <text>瓶喂</text>
+    </view>
+  </view>
+
+  <!-- 计时器（普通添加模式） -->
+  <view class="timer-section" wx:if="{{!showTimePickers}}">
+    <view class="timer-circle" bindtap="toggleTimer">
+      <text class="timer-display">{{timerDisplay}}</text>
+      <text class="timer-hint">{{isTiming ? '点击停止' : '点击开始计时'}}</text>
+    </view>
+    <text class="timer-label">喂奶时长 {{feedTypeLabel}}</text>
+    <!-- 快速时长预设 -->
+    <view class="quick-durations">
+      <text class="quick-btn {{durationPreset === 5 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="5">5分钟</text>
+      <text class="quick-btn {{durationPreset === 10 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="10">10分钟</text>
+      <text class="quick-btn {{durationPreset === 15 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="15">15分钟</text>
+      <text class="quick-btn {{durationPreset === 20 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="20">20分钟</text>
+      <text class="quick-btn {{durationPreset === 30 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="30">30分钟</text>
+      <text class="quick-btn {{durationPreset === -1 ? 'active' : ''}}" bindtap="onQuickDuration" data-value="-1">自定义</text>
+    </view>
+    <input wx:if="{{durationPreset === -1}}" class="custom-duration-input" type="number" placeholder="输入分钟数" value="{{customDuration}}" bindinput="onCustomDurationInput"/>
+  </view>
+
+  <!-- 时间选择器（编辑 / 语音模式） -->
+  <view wx:if="{{showTimePickers}}">
+    <view class="input-group">
+      <text class="input-label">开始时间</text>
+      <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+        <view class="picker-box">{{startDate || '选择日期'}}</view>
+      </picker>
+      <picker mode="time" value="{{startTimeVal}}" bindchange="onStartTimeChange">
+        <view class="picker-box">{{startTimeVal || '选择时间'}}</view>
+      </picker>
+    </view>
+    <view class="input-group">
+      <text class="input-label">结束时间</text>
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+        <view class="picker-box">{{endDate || '选择日期'}}</view>
+      </picker>
+      <picker mode="time" value="{{endTimeVal}}" bindchange="onEndTimeChange">
+        <view class="picker-box">{{endTimeVal || '选择时间'}}</view>
+      </picker>
+    </view>
+    <view class="duration-hint" wx:if="{{durationMinutes > 0}}">
+      <text>喂奶时长：{{durationMinutes}} 分钟</text>
+    </view>
+  </view>
+
+  <!-- 奶量输入（瓶喂时显示） -->
+  <view class="input-group" wx:if="{{feedType === 'bottle'}}">
+    <text class="input-label">奶量 (ml)</text>
+    <input class="amount-input" type="number" placeholder="输入毫升数" value="{{amountMl}}" bindinput="onAmountInput"/>
+    <view class="quick-amounts">
+      <text class="quick-btn" bindtap="onAmountInput" data-value="60">60ml</text>
+      <text class="quick-btn" bindtap="onAmountInput" data-value="90">90ml</text>
+      <text class="quick-btn" bindtap="onAmountInput" data-value="120">120ml</text>
+      <text class="quick-btn" bindtap="onAmountInput" data-value="150">150ml</text>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="note-section">
+    <text class="input-label">备注</text>
+    <view class="note-chips">
+      <text class="note-chip {{selectedNote === item ? 'active' : ''}}" 
+            wx:for="{{noteOptions}}" wx:key="*this" 
+            bindtap="onToggleNote" data-idx="{{index}}">{{item}}</text>
+      <text class="note-chip-custom {{showCustomInput ? 'active' : ''}}" bindtap="toggleCustomInput">+ 自定义</text>
+    </view>
+    <input wx:if="{{showCustomInput}}" class="custom-note-input" 
+           placeholder="输入自定义备注" placeholder-style="color:#B8A99E;font-size:30rpx;" value="{{customNote}}" 
+           bindinput="onCustomNoteInput" maxlength="100"/>
+  </view>
+
+  <!-- 提交 -->
+  <button class="submit-btn" bindtap="onSubmit">保存记录</button>
+</view>
