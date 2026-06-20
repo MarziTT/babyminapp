@@ -8,6 +8,8 @@ Page({
     familyId: '',
     myRole: '',
     userInfo: null,
+    userAvatar: '',
+    greetingText: '欢迎',
     reminder: null,
     todaySummary: {
       feeding: { count: 0, duration: 0, amount: 0, lastTime: '' },
@@ -47,9 +49,27 @@ Page({
 
     var userInfo = wx.getStorageSync('userInfo')
     var cachedBaby = getActiveBaby()
-    this.setData({ userInfo: userInfo, familyId: getFamilyId(), myRole: getMyRole(), activeBaby: cachedBaby })
+    var userAvatar = (userInfo && userInfo.avatarUrl) || ''
+    this.setData({ userInfo: userInfo, familyId: getFamilyId(), myRole: getMyRole(), activeBaby: cachedBaby, userAvatar: userAvatar })
+    this.computeGreeting()
     this.loadFamilyInfo()
     this.loadTodayData()
+  },
+
+  computeGreeting: function () {
+    var h = new Date().getHours()
+    var timeWord = h < 6 ? '夜深了' : h < 9 ? '早上好' : h < 12 ? '上午好' : h < 14 ? '中午好' : h < 18 ? '下午好' : '晚上好'
+    var role = getMyRole()
+    var roleLabel = role === 'mom' ? '妈妈' : role === 'dad' ? '爸爸' : ''
+    var babyName = this.data.babyName || '宝宝'
+    
+    if (this.data.familyId && roleLabel) {
+      this.setData({ greetingText: babyName + roleLabel + '，' + timeWord })
+    } else if (this.data.familyId) {
+      this.setData({ greetingText: timeWord + '，' + babyName })
+    } else {
+      this.setData({ greetingText: '欢迎' })
+    }
   },
 
   onShow: function () {
@@ -107,9 +127,20 @@ Page({
         })
         setFamilyId(res.familyId)
         setMyRole(res.myRole)
+        self.computeGreeting()
+
+        // 有家庭但无宝宝：引导去添加宝宝
+        if (babies.length === 0) {
+          wx.showToast({ title: '请先添加宝宝信息', icon: 'none', duration: 1500 })
+          setTimeout(function () {
+            wx.switchTab({ url: '/pages/family/family' })
+          }, 1500)
+        }
       })
       .catch(function () {
         self.setData({ noFamily: true })
+        // 未加入家庭则跳转家庭页
+        wx.switchTab({ url: '/pages/family/family' })
       })
   },
 

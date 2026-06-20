@@ -4,12 +4,13 @@
   <view class="header">
     <view class="header-top">
       <view class="greeting">
-        <text class="greeting-text">{{familyId ? '下午好' : '欢迎'}}</text>
+        <text class="greeting-text">{{greetingText}}</text>
         <text class="baby-name">{{babyName}}</text>
       </view>
       <view class="header-actions">
         <view class="header-avatar" bindtap="onGoFamily">
-          <image wx:if="{{familyId}}" class="avatar-img" src="/assets/icons/baby-avatar.png" mode="aspectFill" />
+          <image wx:if="{{userAvatar}}" class="avatar-img" src="{{userAvatar}}" mode="aspectFill" />
+          <image wx:elif="{{familyId}}" class="avatar-img" src="/assets/icons/baby-avatar.png" mode="aspectFill" />
           <text wx:else class="avatar-placeholder">👶</text>
         </view>
       </view>

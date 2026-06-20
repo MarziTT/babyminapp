@@ -230,6 +230,18 @@
   margin-left: 4rpx;
 }
 
+/* 退出登录链接 */
+.logout-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 0;
+}
+.logout-link-text {
+  font-size: 26rpx;
+  color: #FF6B6B;
+}
+
 /* 弹窗 */
 .modal-overlay {
   position: fixed;

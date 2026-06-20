@@ -36,8 +36,20 @@ Page({
     this._isUnloaded = false
     this._isSaving = false
     this._msgId = 0
+    // 检查是否已加入家庭
+    var familyId = getFamilyId()
+    if (!familyId) {
+      wx.showToast({ title: '请先创建家庭', icon: 'none', duration: 1500 })
+      setTimeout(function () {
+        wx.switchTab({ url: '/pages/family/family' })
+      }, 1500)
+      return
+    }
     // 欢迎消息
-    this._addMessage('ai', '嗨！我是智能助手，可以直接告诉我宝宝的记录，也可以问我育儿问题。')
+    var role = getMyRole()
+    var roleLabel = role === 'mom' ? '妈妈' : role === 'dad' ? '爸爸' : ''
+    var greeting = roleLabel ? '你好，' + roleLabel + '！' : '嗨！'
+    this._addMessage('ai', greeting + '我是智能助手，可以直接告诉我宝宝的记录，也可以问我育儿问题。')
   },
 
   onUnload: function () {

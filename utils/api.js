@@ -410,7 +410,7 @@ function login(code, nickname, avatarUrl) {
 
 // ========== 家庭 ==========
 
-function createFamily(openid, babyName, babyBirthday, babyAvatar, role) {
+function createFamily(openid, babyName, babyBirthday, babyAvatar, role, babyGender) {
   return request('/api/family/create', {
     method: 'POST',
     data: {
@@ -418,7 +418,8 @@ function createFamily(openid, babyName, babyBirthday, babyAvatar, role) {
       babyName: babyName,
       babyBirthday: babyBirthday,
       babyAvatar: babyAvatar,
-      role: role
+      role: role,
+      babyGender: babyGender || 'male'
     }
   })
 }

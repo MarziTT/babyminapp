@@ -19,13 +19,14 @@
   <block wx:else>
     <!-- 宝宝信息卡片 -->
     <view class="baby-card">
-      <image wx:if="{{babyAvatar}}" class="baby-avatar" src="{{babyAvatar}}" mode="aspectFill" />
+      <image wx:if="{{userAvatar}}" class="baby-avatar" src="{{userAvatar}}" mode="aspectFill" />
+      <image wx:elif="{{babyAvatar}}" class="baby-avatar" src="{{babyAvatar}}" mode="aspectFill" />
       <view wx:else class="baby-avatar-placeholder">
         <text class="placeholder-emoji">👶</text>
       </view>
       <view class="baby-info">
-        <text class="baby-name">{{babyName}}</text>
-        <text class="baby-birthday" wx:if="{{babyBirthday}}">出生: {{babyBirthday}}</text>
+        <text class="baby-name">{{identityGreeting}}</text>
+        <text class="baby-birthday" wx:if="{{babyBirthday}}">宝宝出生: {{babyBirthday}}</text>
       </view>
     </view>
 
@@ -92,11 +93,18 @@
       <text class="code-hint">将家庭码分享给家人，对方可凭此码加入家庭</text>
     </view>
 
-    <!-- 加入其他家庭 -->
+    <!-- 家庭切换 -->
     <view class="section">
       <view class="join-link" bindtap="onShowJoin">
-        <text class="join-link-text">加入其他家庭</text>
+        <text class="join-link-text">加入家庭</text>
         <text class="join-link-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="section">
+      <view class="logout-link" bindtap="onLogout">
+        <text class="logout-link-text">退出登录</text>
       </view>
     </view>
   </block>
@@ -114,6 +122,13 @@
         <picker mode="date" value="{{inputBirthday}}" bindchange="onBirthdayChange">
           <view class="form-picker">{{inputBirthday || '选填'}}</view>
         </picker>
+      </view>
+      <view class="form-group">
+        <text class="form-label">宝宝性别</text>
+        <view class="role-row">
+          <view class="role-tag {{inputBabyGender === 'male' ? 'active' : ''}}" bindtap="onSelectCreateGender" data-gender="male">♂ 男宝</view>
+          <view class="role-tag {{inputBabyGender === 'female' ? 'active' : ''}}" bindtap="onSelectCreateGender" data-gender="female">♀ 女宝</view>
+        </view>
       </view>
       <view class="form-group">
         <text class="form-label">我是</text>

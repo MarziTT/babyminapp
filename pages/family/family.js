@@ -8,6 +8,8 @@ Page({
     babyName: '宝宝',
     babyBirthday: '',
     babyAvatar: '',
+    userAvatar: '',
+    identityGreeting: '宝宝',
     myRole: '',
     members: [],
     hasFamily: false,
@@ -17,6 +19,7 @@ Page({
     showCreate: false,
     inputBabyName: '',
     inputBirthday: '',
+    inputBabyGender: 'male',
     inputRole: '',
 
     // 加入表单
@@ -61,13 +64,35 @@ Page({
 
     getFamilyMembers(openid)
       .then(function (res) {
+        var myRole = res.myRole || ''
+        var babyName = res.babyName || '宝宝'
+        var roleLabel = myRole === 'mom' ? '妈妈' : myRole === 'dad' ? '爸爸' : ''
+        var identityGreeting = roleLabel ? babyName + '的' + roleLabel : babyName
+
+        // 从家庭成员列表中取自己的头像
+        var members = res.members || []
+        var userAvatar = ''
+        for (var i = 0; i < members.length; i++) {
+          if (members[i].openid === openid && members[i].avatar_url) {
+            userAvatar = members[i].avatar_url
+            break
+          }
+        }
+        // 回退到本地 userInfo
+        if (!userAvatar) {
+          var userInfo = wx.getStorageSync('userInfo')
+          if (userInfo && userInfo.avatarUrl) userAvatar = userInfo.avatarUrl
+        }
+
         self.setData({
           familyId: res.familyId,
-          babyName: res.babyName || '宝宝',
+          babyName: babyName,
           babyBirthday: res.babyBirthday || '',
           babyAvatar: res.babyAvatar || '',
-          myRole: res.myRole,
-          members: res.members || [],
+          userAvatar: userAvatar,
+          identityGreeting: identityGreeting,
+          myRole: myRole,
+          members: members,
           babies: res.babies || [],
           hasFamily: true,
           loading: false
@@ -82,7 +107,7 @@ Page({
 
   // ========== 创建家庭 ==========
   onShowCreate: function () {
-    this.setData({ showCreate: true, showJoin: false })
+    this.setData({ showCreate: true, showJoin: false, inputBabyGender: 'male' })
   },
 
   onHideCreate: function () {
@@ -95,6 +120,10 @@ Page({
 
   onBirthdayChange: function (e) {
     this.setData({ inputBirthday: e.detail.value })
+  },
+
+  onSelectCreateGender: function (e) {
+    this.setData({ inputBabyGender: e.currentTarget.dataset.gender })
   },
 
   onSelectCreateRole: function (e) {
@@ -110,7 +139,7 @@ Page({
     }
 
     var role = self.data.inputRole || 'mom'
-    createFamily(openid, self.data.inputBabyName || '宝宝', self.data.inputBirthday, '', role)
+    createFamily(openid, self.data.inputBabyName || '宝宝', self.data.inputBirthday, '', role, self.data.inputBabyGender || 'male')
       .then(function (res) {
         setFamilyId(res.familyId)
         setMyRole(res.role)
@@ -390,5 +419,24 @@ Page({
     })
   },
 
-  catchTap: function () {}
+  catchTap: function () {},
+
+  // ========== 退出登录 ==========
+  onLogout: function () {
+    var self = this
+    wx.showModal({
+      title: '退出登录',
+      content: '退出后需重新授权登录，确定退出吗？',
+      success: function (res) {
+        if (res.confirm) {
+          wx.removeStorageSync('userInfo')
+          wx.removeStorageSync('babycare_openid')
+          wx.removeStorageSync('babycare_family_id')
+          wx.removeStorageSync('babycare_my_role')
+          wx.removeStorageSync('babycare_active_baby')
+          wx.reLaunch({ url: '/pages/login/login' })
+        }
+      }
+    })
+  }
 })
