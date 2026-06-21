@@ -204,7 +204,11 @@ Page({
       return
     }
 
-    var role = self.data.inputRole || 'mom'
+    if (!self.data.inputRole) {
+      wx.showToast({ title: '请选择您的身份（妈妈/爸爸）', icon: 'none' })
+      return
+    }
+    var role = self.data.inputRole
     createFamily(openid, self.data.inputBabyName || '宝宝', self.data.inputBirthday, '', role, self.data.inputBabyGender || 'male')
       .then(function (res) {
         setFamilyId(res.familyId)
@@ -224,7 +228,7 @@ Page({
       wx.showToast({ title: '体验模式无法加入家庭，请先登录微信', icon: 'none', duration: 2000 })
       return
     }
-    this.setData({ showJoin: true, showCreate: false })
+    this.setData({ showJoin: true, showCreate: false, inputFamilyId: '', inputJoinRole: '' })
   },
 
   onHideJoin: function () {
@@ -256,8 +260,12 @@ Page({
       wx.showToast({ title: '请输入家庭码', icon: 'none' })
       return
     }
+    if (!self.data.inputJoinRole) {
+      wx.showToast({ title: '请选择您的身份', icon: 'none' })
+      return
+    }
 
-    joinFamily(openid, familyId, self.data.inputJoinRole || 'other')
+    joinFamily(openid, familyId, self.data.inputJoinRole)
       .then(function (res) {
         setFamilyId(res.familyId)
         setMyRole(res.role)

@@ -17,56 +17,65 @@ Page({
     }
   },
 
-  onGetUserInfo: function (e) {
+  onLoginTap: function () {
     var self = this
-    var userInfo = e.detail.userInfo
-    if (!userInfo) {
-      self.setData({ error: '需要授权才能使用' })
-      return
-    }
-
     self.setData({ loading: true, error: '' })
 
-    wx.login({
-      success: function (loginRes) {
-        if (!loginRes.code) {
-          self.setData({ loading: false, error: '获取登录凭证失败' })
+    // 使用 wx.getUserProfile 获取用户信息（含头像和昵称）
+    wx.getUserProfile({
+      desc: '用于完善会员资料',
+      success: function (profileRes) {
+        var userInfo = profileRes.userInfo
+        if (!userInfo) {
+          self.setData({ loading: false, error: '需要授权才能使用' })
           return
         }
 
-        login(loginRes.code, userInfo.nickName, userInfo.avatarUrl)
-          .then(function (res) {
-            // 微信登录：先尝试恢复之前备份的登录数据
-            restoreLoginData()
-
-            // 覆盖为服务器返回的最新数据
-            setOpenId(res.openid)
-            wx.setStorageSync('userInfo', {
-              nickname: res.nickname || userInfo.nickName,
-              avatarUrl: res.avatarUrl || userInfo.avatarUrl
-            })
-
-            if (res.family) {
-              setFamilyId(res.family.family_id)
-              setMyRole(res.family.role)
+        wx.login({
+          success: function (loginRes) {
+            if (!loginRes.code) {
+              self.setData({ loading: false, error: '获取登录凭证失败' })
+              return
             }
 
-            self.setData({ loading: false })
-            wx.showToast({ title: '登录成功', icon: 'success', duration: 1200 })
-            setTimeout(function () {
-              self.goHome()
-            }, 1200)
-          })
-          .catch(function (err) {
-            console.error('[Login] error:', err)
-            self.setData({
-              loading: false,
-              error: err.message || '登录失败，请重试'
-            })
-          })
+            login(loginRes.code, userInfo.nickName, userInfo.avatarUrl)
+              .then(function (res) {
+                // 微信登录：先尝试恢复之前备份的登录数据
+                restoreLoginData()
+
+                // 覆盖为服务器返回的最新数据
+                setOpenId(res.openid)
+                wx.setStorageSync('userInfo', {
+                  nickname: res.nickname || userInfo.nickName,
+                  avatarUrl: res.avatarUrl || userInfo.avatarUrl
+                })
+
+                if (res.family) {
+                  setFamilyId(res.family.family_id)
+                  setMyRole(res.family.role)
+                }
+
+                self.setData({ loading: false })
+                wx.showToast({ title: '登录成功', icon: 'success', duration: 1200 })
+                setTimeout(function () {
+                  self.goHome()
+                }, 1200)
+              })
+              .catch(function (err) {
+                console.error('[Login] error:', err)
+                self.setData({
+                  loading: false,
+                  error: err.message || '登录失败，请重试'
+                })
+              })
+          },
+          fail: function () {
+            self.setData({ loading: false, error: '微信登录失败' })
+          }
+        })
       },
       fail: function () {
-        self.setData({ loading: false, error: '微信登录失败' })
+        self.setData({ loading: false, error: '需要授权才能使用' })
       }
     })
   },

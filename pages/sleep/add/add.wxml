@@ -7,8 +7,18 @@
     <text class="timer-entry-sub">点击开始计时宝宝睡眠</text>
   </view>
 
-  <!-- 时间选择器 (手动录入模式) -->
-  <view wx:if="{{showTimePickers}}">
+  <!-- 时间模式切换 -->
+  <view class="time-mode-tabs">
+    <view class="time-mode-tab {{timeMode === 'range' ? 'active' : ''}}" bindtap="switchTimeMode" data-mode="range">
+      <text>开始/结束时间</text>
+    </view>
+    <view class="time-mode-tab {{timeMode === 'duration' ? 'active' : ''}}" bindtap="switchTimeMode" data-mode="duration">
+      <text>直接选时长</text>
+    </view>
+  </view>
+
+  <!-- ===== 方案A：开始/结束时间模式 ===== -->
+  <view wx:if="{{showTimePickers && timeMode === 'range'}}">
     <view class="input-group">
       <text class="input-label">开始时间</text>
       <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
@@ -18,7 +28,6 @@
         <view class="picker-box">{{startTimeVal || '选择时间'}}</view>
       </picker>
     </view>
-
     <view class="input-group">
       <text class="input-label">结束时间</text>
       <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
@@ -28,9 +37,29 @@
         <view class="picker-box">{{endTimeVal || '选择时间'}}</view>
       </picker>
     </view>
-
     <view class="duration-hint" wx:if="{{durationMinutes > 0}}">
       <text>预估时长：{{durationMinutes}} 分钟</text>
+    </view>
+  </view>
+
+  <!-- ===== 方案B：直接选时长模式 ===== -->
+  <view wx:if="{{showTimePickers && timeMode === 'duration'}}">
+    <view class="input-group">
+      <text class="input-label">睡眠时长</text>
+      <view class="quick-durations">
+        <text class="quick-dur-btn {{selectedPreset === item ? 'active' : ''}}" 
+              wx:for="{{durationPresets}}" wx:key="*this" 
+              bindtap="onPresetSelect" data-value="{{item}}">{{item}}分钟</text>
+      </view>
+      <view class="custom-duration-row">
+        <text class="custom-duration-label">自定义：</text>
+        <input class="custom-duration-input" type="number" placeholder="输入分钟数" 
+               value="{{customDuration}}" bindinput="onCustomDurationInput"/>
+        <text class="custom-duration-unit">分钟</text>
+      </view>
+    </view>
+    <view class="duration-hint" wx:if="{{durationMinutes > 0}}">
+      <text>预估时长：{{durationMinutes}} 分钟（预计 {{endTimeVal}} 结束）</text>
     </view>
   </view>
 

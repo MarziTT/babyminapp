@@ -15,8 +15,8 @@
       <button class="action-btn primary" bindtap="onShowCreate">创建家庭</button>
       <button class="action-btn" bindtap="onShowJoin">加入家庭</button>
     </view>
-    <view class="logout-link empty-logout" bindtap="onLogout" wx:if="{{isDemo}}">
-      <text class="logout-link-text">退出体验模式</text>
+    <view class="logout-link empty-logout" bindtap="onLogout">
+      <text class="logout-link-text">{{isDemo ? '退出体验模式' : '退出登录'}}</text>
     </view>
   </view>
 

@@ -26,9 +26,9 @@ Page({
       { icon: '⏱️', label: '计时', sub: '工具', page: '/pages/timer/timer', bgColor: '#FFEBEE' },
       { icon: '🎵', label: '白噪音', sub: '安抚', page: '/pages/player/player', bgColor: '#BBDEFB' },
       { icon: '👨‍👩‍👧', label: '家庭', sub: '管理', page: '/pages/family/family', bgColor: '#ECEFF1' },
-      { icon: '📏', label: '成长记录', sub: '身高/体重/头围', page: '/pages/growth/add/add', bgColor: '#F3E5F5' },
-      { icon: '💉', label: '疫苗接种', sub: '接种提醒与记录', page: '/pages/vaccination/add/add', bgColor: '#FFF3E0' },
-      { icon: '💊', label: '用药记录', sub: '药品剂量与频次', page: '/pages/medication/add/add', bgColor: '#E0F2F1' },
+      { icon: '📏', label: '成长记录', sub: '身高/体重/头围', page: '/pages/growth/growth', bgColor: '#F3E5F5' },
+      { icon: '💉', label: '疫苗接种', sub: '接种提醒与记录', page: '/pages/vaccination/vaccination', bgColor: '#FFF3E0' },
+      { icon: '💊', label: '用药记录', sub: '药品剂量与频次', page: '/pages/medication/medication', bgColor: '#E0F2F1' },
     ],
     noFamily: true,
     familyMembers: [],
@@ -73,6 +73,17 @@ Page({
   },
 
   onShow: function () {
+    // 已登录但无家庭时提示（仅在首页触发，避免全局弹窗）
+    var openid = getOpenId()
+    var familyId = getFamilyId()
+    if (openid && !familyId) {
+      wx.showModal({
+        title: '提示',
+        content: '请先创建家庭信息',
+        showCancel: false,
+        confirmText: '知道了'
+      })
+    }
     this.loadFamilyInfo()
     this.loadTodayData()
     this.checkWeeklyReport()
@@ -256,6 +267,11 @@ Page({
 
   onQuickAction: function (e) {
     var page = e.currentTarget.dataset.page
+    // 智能助手暂未开放
+    if (page === '/pages/smart/smart') {
+      wx.showToast({ title: '功能即将开放', icon: 'none', duration: 1500 })
+      return
+    }
     var tabPages = ['/pages/index/index', '/pages/smart/smart', '/pages/report/report', '/pages/ai/ai']
     if (tabPages.indexOf(page) !== -1) {
       wx.switchTab({ url: page })

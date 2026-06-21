@@ -7,8 +7,7 @@
   <view class="login-body">
     <button
       class="login-btn"
-      open-type="getUserInfo"
-      bindgetuserinfo="onGetUserInfo"
+      bindtap="onLoginTap"
       loading="{{loading}}"
       disabled="{{loading}}"
     >

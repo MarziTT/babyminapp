@@ -8,11 +8,17 @@ Page({
     recordId: '',
     isEdit: false,
     showTimePickers: true,
+    // 时间模式：'range' = 开始/结束时间，'duration' = 开始时间+时长
+    timeMode: 'range',
     startDate: H.nowDate(),
     startTimeVal: H.nowTime(),
     endDate: H.nowDate(),
     endTimeVal: H.nowTime(),
     durationMinutes: 0,
+    // 时长模式下的预设选项
+    durationPresets: [10, 20, 30, 45, 60, 90, 120],
+    selectedPreset: 0,
+    customDuration: '',
     note: '',
     noteOptions: ['自主入睡', '哄睡', '奶睡', '入睡困难', '浅睡易醒', '睡得踏实'],
     selectedNote: '',
@@ -107,6 +113,7 @@ Page({
       mode: 'edit',
       recordId: record.id,
       showTimePickers: true,
+      timeMode: 'range',
       startDate: sd.date,
       startTimeVal: sd.timeVal,
       endDate: endDate,
@@ -116,19 +123,87 @@ Page({
       selectedNote: selectedNote,
       customNote: customNote,
       showCustomInput: !!customNote,
+      selectedPreset: 0,
+      customDuration: '',
     })
+  },
+
+  /* ===== 时间模式切换 ===== */
+
+  switchTimeMode: function(e) {
+    var newMode = e.currentTarget.dataset.mode
+    if (newMode === this.data.timeMode) return
+    this.setData({ timeMode: newMode })
+    if (newMode === 'duration') {
+      this.calcDurationFromPreset()
+    } else {
+      this.recalcEndFromDuration()
+    }
+  },
+
+  /* ===== 时长模式：预设选择 ===== */
+
+  onPresetSelect: function(e) {
+    var val = parseInt(e.currentTarget.dataset.value) || 0
+    this.setData({
+      selectedPreset: val,
+      customDuration: '',
+      durationMinutes: val
+    })
+    this.recalcEndFromDuration()
+  },
+
+  onCustomDurationInput: function(e) {
+    var val = parseInt(e.detail.value) || 0
+    this.setData({
+      customDuration: e.detail.value,
+      selectedPreset: 0,
+      durationMinutes: val > 0 ? val : 0
+    })
+    if (val > 0) this.recalcEndFromDuration()
+  },
+
+  recalcEndFromDuration: function() {
+    var durMin = this.data.durationMinutes
+    if (durMin <= 0) return
+    var start = new Date(this.data.startDate + 'T' + this.data.startTimeVal + ':00')
+    var end = new Date(start.getTime() + durMin * 60 * 1000)
+    this.setData({
+      endDate: end.getFullYear() + '-' + H.pad2(end.getMonth() + 1) + '-' + H.pad2(end.getDate()),
+      endTimeVal: H.pad2(end.getHours()) + ':' + H.pad2(end.getMinutes()),
+      durationMinutes: durMin
+    })
+  },
+
+  calcDurationFromPreset: function() {
+    var dur = this.data.selectedPreset
+    if (!dur && this.data.customDuration) {
+      dur = parseInt(this.data.customDuration) || 0
+    }
+    if (dur > 0) {
+      this.setData({ durationMinutes: dur })
+      this.recalcEndFromDuration()
+    }
   },
 
   /* ===== 时间选择器 ===== */
 
   onStartDateChange: function(e) {
     this.setData({ startDate: e.detail.value })
-    this.calcDuration()
+    if (this.data.timeMode === 'range') {
+      this.calcDuration()
+    } else {
+      this.recalcEndFromDuration()
+    }
   },
 
   onStartTimeChange: function(e) {
     this.setData({ startTimeVal: e.detail.value })
-    this.calcDuration()
+    if (this.data.timeMode === 'range') {
+      this.calcDuration()
+    } else {
+      this.recalcEndFromDuration()
+    }
   },
 
   onEndDateChange: function(e) {
@@ -155,7 +230,6 @@ Page({
     var label = this.data.noteOptions[idx]
     if (label === undefined) return
     var current = this.data.selectedNote
-    // 互斥：选预设则关闭自定义
     this.setData({ selectedNote: current === label ? '' : label, showCustomInput: false, customNote: '' })
   },
 
@@ -164,7 +238,6 @@ Page({
   },
 
   toggleCustomInput: function() {
-    // 互斥：开自定义则清预设
     if (!this.data.showCustomInput) {
       this.setData({ showCustomInput: true, selectedNote: '' })
     } else {
@@ -182,16 +255,28 @@ Page({
       note = note ? note + '，' + this.data.customNote.trim() : this.data.customNote.trim()
     }
 
-    var startTime = this.data.startDate + 'T' + this.data.startTimeVal + ':00'
-    var endTime = this.data.endDate + 'T' + this.data.endTimeVal + ':00'
-    var durationMinutes = this.data.durationMinutes
+    var startTime, endTime, durationMinutes
+
+    if (this.data.timeMode === 'duration') {
+      // 时长模式：开始时间自动取当前时间，结束时间 = now + 所选时长
+      var now = new Date()
+      var startDate = now.getFullYear() + '-' + H.pad2(now.getMonth() + 1) + '-' + H.pad2(now.getDate())
+      var startTimeVal = H.pad2(now.getHours()) + ':' + H.pad2(now.getMinutes())
+      startTime = startDate + 'T' + startTimeVal + ':00'
+      durationMinutes = this.data.durationMinutes
+      var endDate = new Date(now.getTime() + durationMinutes * 60 * 1000)
+      endTime = endDate.getFullYear() + '-' + H.pad2(endDate.getMonth() + 1) + '-' + H.pad2(endDate.getDate()) + 'T' + H.pad2(endDate.getHours()) + ':' + H.pad2(endDate.getMinutes()) + ':00'
+    } else {
+      startTime = this.data.startDate + 'T' + this.data.startTimeVal + ':00'
+      endTime = this.data.endDate + 'T' + this.data.endTimeVal + ':00'
+      durationMinutes = this.data.durationMinutes
+    }
 
     if (durationMinutes <= 0) {
       wx.showToast({ title: '请选择有效的时间范围', icon: 'none' })
       return
     }
 
-    // 新增校验：不允许未来日期 + 不允许重复（编辑模式跳过）
     if (this.data.mode !== 'edit') {
       var now = new Date()
       var startDate = new Date(startTime)
