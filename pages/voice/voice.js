@@ -119,7 +119,8 @@ Page({
       .catch(function (err) {
         console.error('[Voice] 解析失败:', err)
         self.setData({ isParsing: false })
-        wx.showToast({ title: '解析失败，请重试', icon: 'none' })
+        var msg = (err && err.message) || '解析失败，请重试'
+        wx.showToast({ title: msg, icon: 'none' })
       })
   },
 
@@ -241,8 +242,9 @@ Page({
         console.error('[Voice onConfirm] fail:', err.message || err)
         wx.hideLoading()
         if (self._isUnloaded) return
-        // 保存失败 → 保留卡片，恢复按钮供重试
-        wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+        // 保存失败 → 保留卡片，恢复按钮供重试；显示后端返回的具体原因
+        var msg = (err && err.message) || '保存失败，请重试'
+        wx.showToast({ title: msg, icon: 'none', duration: 2500 })
         self._isSaving = false
         self.setData({ _isSaving: false })
       })

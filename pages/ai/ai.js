@@ -47,11 +47,12 @@ Page({
         isSending: false,
       })
       wx.pageScrollTo({ scrollTop: 99999, duration: 200 })
-    }).catch(function() {
+    }).catch(function(err) {
       var msgs = self.data.messages
       msgs.pop()
       self.setData({ messages: msgs, inputValue: value, isSending: false })
-      wx.showToast({ title: 'AI 暂时无法回复', icon: 'none' })
+      var msg = (err && err.message) || 'AI 暂时无法回复'
+      wx.showToast({ title: msg, icon: 'none' })
     })
   },
 

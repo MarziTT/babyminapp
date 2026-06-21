@@ -26,10 +26,17 @@ function request(url, options) {
       },
       success: function (res) {
         var body = res.data
-        if (body.code === 0) {
+        // 优先按 HTTP 状态码判断：4xx/5xx 一律视为业务错误
+        if (res.statusCode >= 400) {
+          var errMsg = (body && body.message) || ''
+          if (!errMsg && typeof body === 'string') errMsg = body
+          reject(new Error(errMsg || '请求失败（' + res.statusCode + '）'))
+          return
+        }
+        if (body && body.code === 0) {
           resolve(body.data)
         } else {
-          reject(new Error(body.message || '请求失败'))
+          reject(new Error((body && body.message) || '请求失败'))
         }
       },
       fail: function (err) {
