@@ -7,6 +7,8 @@
  */
 
 var { smartChat, voiceToRecord, createFeeding, createSleep, createDiaper, createGrowth, createMedication, createVaccination, createNote } = require('../../utils/api')
+var WechatSI = null
+try { WechatSI = requirePlugin('WechatSI') } catch (e) { console.warn('[Smart] 微信同声传译插件未加载:', e) }
 var { getBabyId, getFamilyId, getOpenId } = require('../../utils/baby')
 var H = require('../../utils/helpers')
 
@@ -375,21 +377,81 @@ Page({
 
   _initRecorder: function () {
     var self = this
-    var rm = wx.getRecorderManager()
-    self._recorderManager = rm
 
-    rm.onStart(function () {
+    // 优先使用微信同声传译插件（免费、无需后端 ASR）
+    if (WechatSI) {
+      var rm = WechatSI.getRecordRecognitionManager()
+      self._recorderManager = rm
+      self._usePluginASR = true
+
+      rm.onStart(function () {
+        self._voiceRecording = true
+        self.setData({
+          isRecording: true,
+          voiceCancelHint: false,
+          inputFocus: false,
+        })
+        self._startDotsAnimation()
+      })
+
+      rm.onRecognize(function (res) {
+        // 实时展示部分识别结果
+        if (res && res.result) {
+          self.setData({ inputText: res.result })
+        }
+      })
+
+      rm.onStop(function (res) {
+        self._voiceRecording = false
+        self._stopDotsAnimation()
+        self.setData({ isRecording: false, voiceCancelHint: false })
+
+        if (self._voiceCancelled) {
+          self._voiceCancelled = false
+          self.setData({ inputText: '' })
+          return
+        }
+
+        wx.hideLoading()
+
+        var text = (res && res.result) || ''
+        if (!text) {
+          wx.showToast({ title: '没听清，再说一次吧～', icon: 'none' })
+          return
+        }
+
+        self._addMessage('user', '[语音] ' + text)
+        self.setData({ inputText: text, loading: true })
+        self._doSmartChat(text, 0)
+      })
+
+      rm.onError(function (err) {
+        console.error('[Smart] 语音识别错误:', err)
+        self._voiceRecording = false
+        self._stopDotsAnimation()
+        self.setData({ isRecording: false, voiceCancelHint: false, inputText: '' })
+        wx.hideLoading()
+        wx.showToast({ title: '语音识别失败，请重试', icon: 'none' })
+      })
+      return
+    }
+
+    // 降级：使用原生 RecorderManager + 后端 ASR
+    self._usePluginASR = false
+    var rm2 = wx.getRecorderManager()
+    self._recorderManager = rm2
+
+    rm2.onStart(function () {
       self._voiceRecording = true
       self.setData({
         isRecording: true,
         voiceCancelHint: false,
         inputFocus: false,
       })
-      // 录音波形动画
       self._startDotsAnimation()
     })
 
-    rm.onStop(function (res) {
+    rm2.onStop(function (res) {
       self._voiceRecording = false
       self._stopDotsAnimation()
       self.setData({ isRecording: false, voiceCancelHint: false })
@@ -405,7 +467,6 @@ Page({
         console.error('[Smart] 录音文件路径为空')
         return
       }
-      // 最短录音 1 秒
       if (duration < 1000) {
         wx.showToast({ title: '说话时间太短', icon: 'none' })
         return
@@ -413,7 +474,7 @@ Page({
       self._uploadVoice(tempFilePath)
     })
 
-    rm.onError(function (err) {
+    rm2.onError(function (err) {
       console.error('[Smart] 录音错误:', err)
       self._voiceRecording = false
       self._stopDotsAnimation()
@@ -472,13 +533,21 @@ Page({
 
   _startRecord: function () {
     var self = this
-    self._recorderManager.start({
-      duration: 60000,
-      sampleRate: 16000,
-      numberOfChannels: 1,
-      encodeBitRate: 48000,
-      format: 'mp3',
-    })
+    if (self._usePluginASR) {
+      wx.showLoading({ title: '识别中...', mask: true })
+      self._recorderManager.start({
+        duration: 60000,
+        lang: 'zh_CN',
+      })
+    } else {
+      self._recorderManager.start({
+        duration: 60000,
+        sampleRate: 16000,
+        numberOfChannels: 1,
+        encodeBitRate: 48000,
+        format: 'mp3',
+      })
+    }
   },
 
   onVoiceMove: function (e) {
