@@ -42,6 +42,18 @@ App({
     console.log('[BabyCare] App launched, openid:', openid, 'familyId:', familyId)
   },
 
+  onShow: function () {
+    var familyId = getFamilyId()
+    if (!familyId) {
+      wx.showModal({
+        title: '提示',
+        content: '请先创建家庭信息',
+        showCancel: false,
+        confirmText: '知道了'
+      })
+    }
+  },
+
   globalData: {
     userInfo: null,
     openid: '',
