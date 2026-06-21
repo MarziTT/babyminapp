@@ -6,7 +6,7 @@
  *   intent=record → 显示 AI 回复 + 内联确认卡片
  */
 
-var { smartChat, createFeeding, createSleep, createDiaper, createGrowth, createMedication, createVaccination, createNote } = require('../../utils/api')
+var { smartChat, voiceToRecord, createFeeding, createSleep, createDiaper, createGrowth, createMedication, createVaccination, createNote } = require('../../utils/api')
 var { getBabyId, getFamilyId, getOpenId } = require('../../utils/baby')
 var H = require('../../utils/helpers')
 
@@ -26,6 +26,10 @@ Page({
     inputText: '',
     loading: false,
     scrollIntoView: '',
+    isRecording: false,
+    recordingDots: '',
+    voiceCancelHint: false,
+    inputFocus: false,
   },
 
   _msgId: 0,
@@ -36,6 +40,8 @@ Page({
     this._isUnloaded = false
     this._isSaving = false
     this._msgId = 0
+    // 初始化录音管理器
+    this._initRecorder()
     // 检查是否已加入家庭
     var familyId = getFamilyId()
     if (!familyId) {
@@ -358,5 +364,220 @@ Page({
       if (list[i].id === msgId) return list[i]
     }
     return null
+  },
+
+  /* ===== 语音输入 ===== */
+
+  _voiceTouchY: 0,
+  _recorderManager: null,
+  _voiceDotsTimer: null,
+  _voiceRecording: false,
+
+  _initRecorder: function () {
+    var self = this
+    var rm = wx.getRecorderManager()
+    self._recorderManager = rm
+
+    rm.onStart(function () {
+      self._voiceRecording = true
+      self.setData({
+        isRecording: true,
+        voiceCancelHint: false,
+        inputFocus: false,
+      })
+      // 录音波形动画
+      self._startDotsAnimation()
+    })
+
+    rm.onStop(function (res) {
+      self._voiceRecording = false
+      self._stopDotsAnimation()
+      self.setData({ isRecording: false, voiceCancelHint: false })
+
+      if (self._voiceCancelled) {
+        self._voiceCancelled = false
+        return
+      }
+
+      var tempFilePath = res.tempFilePath
+      var duration = res.duration
+      if (!tempFilePath) {
+        console.error('[Smart] 录音文件路径为空')
+        return
+      }
+      // 最短录音 1 秒
+      if (duration < 1000) {
+        wx.showToast({ title: '说话时间太短', icon: 'none' })
+        return
+      }
+      self._uploadVoice(tempFilePath)
+    })
+
+    rm.onError(function (err) {
+      console.error('[Smart] 录音错误:', err)
+      self._voiceRecording = false
+      self._stopDotsAnimation()
+      self.setData({ isRecording: false, voiceCancelHint: false })
+      wx.showToast({ title: '录音失败，请重试', icon: 'none' })
+    })
+  },
+
+  _startDotsAnimation: function () {
+    var self = this
+    var frames = ['●', '●●', '●●●', '●●●●']
+    var idx = 0
+    self._voiceDotsTimer = setInterval(function () {
+      self.setData({ recordingDots: frames[idx] })
+      idx = (idx + 1) % frames.length
+    }, 300)
+  },
+
+  _stopDotsAnimation: function () {
+    if (this._voiceDotsTimer) {
+      clearInterval(this._voiceDotsTimer)
+      this._voiceDotsTimer = null
+    }
+    this.setData({ recordingDots: '' })
+  },
+
+  onVoiceStart: function (e) {
+    if (this.data.loading || this._voiceRecording) return
+    this._voiceCancelled = false
+    this._voiceTouchY = e.touches[0].clientY
+
+    // 检查录音权限
+    var self = this
+    wx.getSetting({
+      success: function (res) {
+        if (res.authSetting['scope.record'] === false) {
+          wx.showModal({
+            title: '需要录音权限',
+            content: '请在设置中允许使用麦克风',
+            confirmText: '去设置',
+            success: function (modalRes) {
+              if (modalRes.confirm) {
+                wx.openSetting()
+              }
+            }
+          })
+          return
+        }
+        self._startRecord()
+      },
+      fail: function () {
+        self._startRecord()
+      }
+    })
+  },
+
+  _startRecord: function () {
+    var self = this
+    self._recorderManager.start({
+      duration: 60000,
+      sampleRate: 16000,
+      numberOfChannels: 1,
+      encodeBitRate: 48000,
+      format: 'mp3',
+    })
+  },
+
+  onVoiceMove: function (e) {
+    if (!this._voiceRecording) return
+    var deltaY = this._voiceTouchY - e.touches[0].clientY
+    // 上滑超过 60px 显示取消提示
+    if (deltaY > 60) {
+      if (!this.data.voiceCancelHint) {
+        this.setData({ voiceCancelHint: true })
+      }
+    } else {
+      if (this.data.voiceCancelHint) {
+        this.setData({ voiceCancelHint: false })
+      }
+    }
+  },
+
+  onVoiceEnd: function () {
+    if (!this._voiceRecording) return
+    if (this.data.voiceCancelHint) {
+      this._voiceCancelled = true
+    }
+    this._recorderManager.stop()
+  },
+
+  onVoiceCancel: function () {
+    if (this._voiceRecording) {
+      this._voiceCancelled = true
+      this._recorderManager.stop()
+    }
+  },
+
+  _uploadVoice: function (tempFilePath) {
+    var self = this
+    wx.showLoading({ title: '识别中...', mask: true })
+
+    // 读取音频文件为 base64
+    try {
+      var fs = wx.getFileSystemManager()
+      var base64 = fs.readFileSync(tempFilePath, 'base64')
+      if (!base64) {
+        wx.hideLoading()
+        wx.showToast({ title: '读取音频失败', icon: 'none' })
+        return
+      }
+    } catch (e) {
+      console.error('[Smart] 读取音频文件失败:', e)
+      wx.hideLoading()
+      wx.showToast({ title: '读取音频失败', icon: 'none' })
+      return
+    }
+
+    voiceToRecord(base64, 'mp3').then(function (result) {
+      wx.hideLoading()
+
+      var intent = result.intent || 'chat'
+      var reply = result.reply || '好的，已记录～'
+      var recType = result.record_type
+      var text = result.text || '' // 语音识别出的文字
+
+      // 显示识别文字
+      if (text) {
+        self._addMessage('user', '[语音] ' + text)
+      }
+
+      if (intent === 'record' && recType && recType !== 'unknown') {
+        var cardData = result.parsed || {}
+        if (cardData.amount_ml) cardData._amount_text = String(cardData.amount_ml)
+        if (cardData.duration_minutes) {
+          cardData._duration_text = String(cardData.duration_minutes)
+          cardData._showDuration = true
+        }
+        if (cardData.height_cm) cardData._height_text = String(cardData.height_cm)
+        if (cardData.weight_kg) cardData._weight_text = String(cardData.weight_kg)
+        if (cardData.head_circumference_cm) cardData._head_text = String(cardData.head_circumference_cm)
+        if (cardData.start_time) {
+          cardData._time_display = H.formatDisplayTime(cardData.start_time)
+        }
+        if (cardData.end_time) {
+          cardData._end_time_display = H.formatDisplayTime(cardData.end_time)
+        }
+        if (cardData.time) {
+          cardData._time_display = H.formatDisplayTime(cardData.time)
+        }
+        self._addMessage('ai', reply, {
+          hasCard: true,
+          cardType: recType,
+          cardLabel: TYPE_NAMES[recType] || recType,
+          cardData: cardData,
+          cardConfirmed: false,
+          cardSaving: false,
+        })
+      } else {
+        self._addMessage('ai', reply)
+      }
+    }).catch(function (err) {
+      wx.hideLoading()
+      console.error('[Smart] 语音识别失败:', err)
+      wx.showToast({ title: 'AI 功能即将开放', icon: 'none', duration: 2000 })
+    })
   },
 })

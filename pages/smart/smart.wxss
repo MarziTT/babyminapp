@@ -357,7 +357,7 @@ page {
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  width: 580rpx;
+  width: 660rpx;
   margin: 0 auto;
 }
 
@@ -374,6 +374,79 @@ page {
 
 .text-input::placeholder {
   color: #A8B2BF;
+}
+
+/* ===== 麦克风按钮 ===== */
+.voice-btn {
+  flex-shrink: 0;
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 50%;
+  background: #F5F7FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #E8ECF1;
+  transition: all 0.15s ease;
+}
+
+.voice-btn:active {
+  background: #E3E8F0;
+  transform: scale(0.95);
+}
+
+.voice-btn-active {
+  background: #667EEA;
+  border-color: #667EEA;
+  animation: voicePulse 1.2s ease-in-out infinite;
+}
+
+.voice-btn-active .voice-icon,
+.voice-btn-cancel .voice-icon {
+  filter: brightness(0) invert(1);
+}
+
+.voice-btn-cancel {
+  background: #E74C3C;
+  border-color: #E74C3C;
+  animation: none;
+}
+
+.voice-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+/* 录音脉冲动画 */
+@keyframes voicePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 16rpx rgba(102, 126, 234, 0);
+  }
+}
+
+/* ===== 录音状态提示 ===== */
+.recording-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12rpx;
+}
+
+.recording-wave {
+  font-size: 24rpx;
+  color: #667EEA;
+  letter-spacing: 4rpx;
+  min-height: 32rpx;
+  line-height: 32rpx;
+}
+
+.recording-text {
+  font-size: 22rpx;
+  color: #8894A3;
+  margin-top: 4rpx;
 }
 
 .send-btn {
