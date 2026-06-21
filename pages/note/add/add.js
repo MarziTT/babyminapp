@@ -80,6 +80,7 @@ Page({
   },
 
   onSubmit: function () {
+    if (!getFamilyId()) { wx.showToast({ title: '请先创建家庭信息', icon: 'none', duration: 2000 }); return }
     var self = this
     var babyId = getBabyId() || 'baby-001'
     var text = self.data.text.trim()

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BabyCare 后台管理</title>
+<style>
+:root {
+  --primary: #4A90D9;
+  --primary-dark: #357ABD;
+  --primary-light: #EBF4FF;
+  --danger: #E74C3C;
+  --danger-light: #FDEDEC;
+  --success: #27AE60;
+  --success-light: #E8F8F0;
+  --warning: #F39C12;
+  --warning-light: #FEF5E7;
+  --bg: #F5F7FA;
+  --card-bg: #FFFFFF;
+  --text: #2C3E50;
+  --text-secondary: #7F8C8D;
+  --border: #E1E8ED;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --radius: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* Login */
+.login-container {
+  display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+}
+.login-card {
+  background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  padding: 40px; width: 100%; max-width: 420px;
+}
+.login-card h1 { font-size: 24px; text-align: center; margin-bottom: 4px; color: var(--primary); }
+.login-card .subtitle { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 32px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--text); }
+.form-group input {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 14px; outline: none; transition: border-color 0.2s;
+}
+.form-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px;
+  border: none; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s; text-decoration: none;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #C0392B; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover { background: var(--bg); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-block { width: 100%; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Layout */
+.admin-layout { display: none; min-height: 100vh; }
+.admin-layout.active { display: flex; }
+.sidebar {
+  width: 220px; background: var(--card-bg); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 10;
+}
+.sidebar-header {
+  padding: 20px; border-bottom: 1px solid var(--border); display: flex;
+  align-items: center; gap: 10px;
+}
+.sidebar-header .logo { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; }
+.sidebar-header h2 { font-size: 16px; color: var(--text); }
+.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.sidebar-nav a {
+  display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: var(--text-secondary);
+  text-decoration: none; font-size: 14px; transition: all 0.15s; border-left: 3px solid transparent;
+}
+.sidebar-nav a:hover { background: var(--bg); color: var(--text); }
+.sidebar-nav a.active { background: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 500; }
+.sidebar-nav a .icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+.main-content { flex: 1; margin-left: 220px; padding: 24px 32px; overflow-y: auto; }
+.page-header { margin-bottom: 24px; }
+.page-header h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+.page-header p { color: var(--text-secondary); font-size: 14px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* Stats */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 16px;
+}
+.stat-card .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.stat-card .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+.stat-card .stat-icon.green { background: var(--success-light); color: var(--success); }
+.stat-card .stat-icon.orange { background: var(--warning-light); color: var(--warning); }
+.stat-card .stat-icon.red { background: var(--danger-light); color: var(--danger); }
+.stat-card .stat-value { font-size: 28px; font-weight: 700; line-height: 1.2; }
+.stat-card .stat-label { font-size: 13px; color: var(--text-secondary); }
+
+/* Card */
+.card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-header h3 { font-size: 16px; font-weight: 600; }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; padding: 10px 12px; background: var(--bg); color: var(--text-secondary); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+td { padding: 12px; border-bottom: 1px solid var(--border); }
+tr:hover { background: var(--bg); }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;
+}
+.badge-success { background: var(--success-light); color: var(--success); }
+.badge-warning { background: var(--warning-light); color: var(--warning); }
+.badge-danger { background: var(--danger-light); color: var(--danger); }
+.badge-info { background: var(--primary-light); color: var(--primary); }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.tab {
+  padding: 8px 16px; border: none; background: transparent; color: var(--text-secondary);
+  font-size: 13px; cursor: pointer; border-radius: var(--radius) var(--radius) 0 0;
+  transition: all 0.15s; position: relative; bottom: -1px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--primary); font-weight: 500; border-bottom: 2px solid var(--primary); }
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 100; align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--card-bg); border-radius: 12px; padding: 24px; width: 90%; max-width: 560px;
+  max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.modal h3 { margin-bottom: 16px; font-size: 18px; }
+.modal-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary); padding: 0 4px; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 20px; right: 20px; z-index: 200; padding: 12px 20px; border-radius: var(--radius);
+  color: #fff; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: slideIn 0.3s ease;
+}
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Loading */
+.loading { text-align: center; padding: 40px; color: var(--text-secondary); }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Empty */
+.empty { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div id="loginPage" class="login-container">
+  <div class="login-card">
+    <h1>BabyCare</h1>
+    <p class="subtitle">后台管理系统</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>后端 API 地址</label>
+        <input type="text" id="apiBase" value="https://babycare-backend-teha.onrender.com" placeholder="https://babycare-backend-teha.onrender.com">
+      </div>
+      <div class="form-group">
+        <label>管理密钥 (Admin Key)</label>
+        <input type="password" id="adminKey" placeholder="请输入管理密钥">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">登 录</button>
+    </form>
+  </div>
+</div>
+
+<!-- Admin Layout -->
+<div id="adminLayout" class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">B</div>
+      <h2>BabyCare</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" data-page="dashboard" class="active"><span class="icon">&#x2302;</span> 仪表盘</a>
+      <a href="#" data-page="families"><span class="icon">&#x1F465;</span> 家庭管理</a>
+      <a href="#" data-page="users"><span class="icon">&#x1F464;</span> 用户管理</a>
+      <a href="#" data-page="records"><span class="icon">&#x1F4DD;</span> 记录管理</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-outline btn-sm btn-block" onclick="logout()">退出登录</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <!-- Dashboard -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header"><h2>仪表盘</h2><p>系统核心数据概览</p></div>
+      <div id="statsGrid" class="stats-grid"><div class="loading"><div class="spinner"></div>加载中...</div></div>
+    </div>
+
+    <!-- Families -->
+    <div id="page-families" class="page">
+      <div class="page-header"><h2>家庭管理</h2><p>查看和管理所有家庭</p></div>
+      <div class="card">
+        <div class="card-header"><h3>家庭列表</h3><span id="familyCount" style="color:var(--text-secondary);font-size:13px;"></span></div>
+        <div class="table-wrap" id="familiesTable"><div class="loading"><div class="spinner"></div>加载中...</div></div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div id="page-users" class="page">
+      <div class="page-header"><h2>用户管理</h2><p>查看和管理所有用户</p></div>
+      <div class="card">
+        <div class="card-header"><h3>用户列表</h3><span id="userCount" style="color:var(--text-secondary);font-size:13px;"></span></div>
+        <div class="table-wrap" id="usersTable"><div class="loading"><div class="spinner"></div>加载中...</div></div>
+      </div>
+    </div>
+
+    <!-- Records -->
+    <div id="page-records" class="page">
+      <div class="page-header"><h2>记录管理</h2><p>按类型筛选查看最近记录</p></div>
+      <div class="tabs" id="recordTabs">
+        <button class="tab active" data-type="feeding">喂养</button>
+        <button class="tab" data-type="sleep">睡眠</button>
+        <button class="tab" data-type="diaper">尿布</button>
+        <button class="tab" data-type="growth">成长</button>
+        <button class="tab" data-type="medication">用药</button>
+        <button class="tab" data-type="vaccination">疫苗</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 id="recordTitle">喂养记录</h3><span id="recordCount" style="color:var(--text-secondary);font-size:13px;"></span></div>
+        <div class="table-wrap" id="recordsTable"><div class="loading"><div class="spinner"></div>加载中...</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ==================== State ====================
+  const STORAGE_KEY = 'babycare_admin';
+  let state = loadState();
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : { apiBase: '', adminKey: '' };
+    } catch (e) {
+      return { apiBase: '', adminKey: '' };
+    }
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // ==================== API ====================
+  async function api(path, options = {}) {
+    const url = state.apiBase.replace(/\/+$/, '') + path;
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Key': state.adminKey,
+        ...(options.headers || {}),
+      },
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || err.message || `HTTP ${res.status}`);
+    }
+    return res.json();
+  }
+
+  // ==================== Toast ====================
+  function toast(msg, type) {
+    type = type || 'success';
+    const el = document.createElement('div');
+    el.className = 'toast toast-' + type;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function() { el.remove(); }, 3000);
+  }
+
+  // ==================== Navigation ====================
+  function navigate(page) {
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.sidebar-nav a').forEach(function(a) { a.classList.remove('active'); });
+
+    var target = document.getElementById('page-' + page);
+    if (target) target.classList.add('active');
+
+    var link = document.querySelector('.sidebar-nav a[data-page="' + page + '"]');
+    if (link) link.classList.add('active');
+
+    if (page === 'dashboard') loadDashboard();
+    else if (page === 'families') loadFamilies();
+    else if (page === 'users') loadUsers();
+    else if (page === 'records') loadRecords();
+  }
+
+  // ==================== Login ====================
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    state.apiBase = document.getElementById('apiBase').value.trim();
+    state.adminKey = document.getElementById('adminKey').value.trim();
+    if (!state.apiBase || !state.adminKey) {
+      toast('请填写 API 地址和管理密钥', 'error');
+      return;
+    }
+    saveState();
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminLayout').classList.add('active');
+    navigate('dashboard');
+  });
+
+  window.logout = function() {
+    state.adminKey = '';
+    saveState();
+    document.getElementById('adminLayout').classList.remove('active');
+    document.getElementById('loginPage').style.display = 'flex';
+  };
+
+  // ==================== Sidebar Nav ====================
+  document.querySelectorAll('.sidebar-nav a').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      navigate(this.getAttribute('data-page'));
+    });
+  });
+
+  // ==================== Dashboard ====================
+  function loadDashboard() {
+    var grid = document.getElementById('statsGrid');
+    grid.innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+
+    api('/api/admin/stats').then(function(data) {
+      var stats = [
+        { label: '家庭总数', value: data.families || 0, icon: '&#x1F3E0;', cls: 'blue' },
+        { label: '宝宝总数', value: data.babies || 0, icon: '&#x1F476;', cls: 'green' },
+        { label: '记录总数', value: data.records || 0, icon: '&#x1F4DD;', cls: 'orange' },
+        { label: '用户总数', value: data.users || 0, icon: '&#x1F464;', cls: 'red' },
+      ];
+      grid.innerHTML = stats.map(function(s) {
+        return '<div class="stat-card">' +
+          '<div class="stat-icon ' + s.cls + '">' + s.icon + '</div>' +
+          '<div><div class="stat-value">' + s.value + '</div><div class="stat-label">' + s.label + '</div></div>' +
+          '</div>';
+      }).join('');
+    }).catch(function(err) {
+      grid.innerHTML = '<div class="empty">加载失败: ' + err.message + '</div>';
+    });
+  }
+
+  // ==================== Families ====================
+  function loadFamilies() {
+    var container = document.getElementById('familiesTable');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+
+    api('/api/admin/families').then(function(data) {
+      var families = data.families || [];
+      document.getElementById('familyCount').textContent = '共 ' + families.length + ' 个家庭';
+      if (families.length === 0) {
+        container.innerHTML = '<div class="empty">暂无家庭数据</div>';
+        return;
+      }
+      container.innerHTML = renderTable(
+        ['ID', '家庭名称', '创建者', '成员数', '宝宝数', '创建时间', '操作'],
+        families.map(function(f) { return [f.id, f.name, f.creator_name || '-', f.member_count || 0, f.baby_count || 0, formatTime(f.created_at), '<button class="btn btn-outline btn-sm" onclick="viewFamily(\'' + f.id + '\')">成员</button> <button class="btn btn-danger btn-sm" onclick="deleteFamily(\'' + f.id + '\',\'' + (f.name || '') + '\')">删除</button>']; })
+      );
+    }).catch(function(err) {
+      container.innerHTML = '<div class="empty">加载失败: ' + err.message + '</div>';
+    });
+  }
+
+  window.viewFamily = function(id) {
+    api('/api/admin/families/' + id).then(function(data) {
+      var members = data.members || [];
+      var html = '<h3>家庭成员</h3>';
+      if (members.length === 0) {
+        html += '<div class="empty">暂无成员</div>';
+      } else {
+        html += renderTable(
+          ['昵称', '角色', '加入时间'],
+          members.map(function(m) { return [m.nickname || '-', m.role || '-', formatTime(m.joined_at)]; })
+        );
+      }
+      showModal(html);
+    }).catch(function(err) {
+      toast('获取成员失败: ' + err.message, 'error');
+    });
+  };
+
+  window.deleteFamily = function(id, name) {
+    if (!confirm('确定要删除家庭 "' + name + '" 吗？此操作不可撤销。')) return;
+    api('/api/admin/families/' + id, { method: 'DELETE' }).then(function() {
+      toast('已删除');
+      loadFamilies();
+    }).catch(function(err) {
+      toast('删除失败: ' + err.message, 'error');
+    });
+  };
+
+  // ==================== Users ====================
+  function loadUsers() {
+    var container = document.getElementById('usersTable');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+
+    api('/api/admin/users').then(function(data) {
+      var users = data.users || [];
+      document.getElementById('userCount').textContent = '共 ' + users.length + ' 个用户';
+      if (users.length === 0) {
+        container.innerHTML = '<div class="empty">暂无用户数据</div>';
+        return;
+      }
+      container.innerHTML = renderTable(
+        ['ID', '昵称', '手机号', '状态', '角色', '注册时间', '操作'],
+        users.map(function(u) {
+          var statusBadge = u.disabled ? '<span class="badge badge-danger">已禁用</span>' : '<span class="badge badge-success">正常</span>';
+          var toggleBtn = u.disabled
+            ? '<button class="btn btn-outline btn-sm" onclick="toggleUser(\'' + u.id + '\',false)">启用</button>'
+            : '<button class="btn btn-warning btn-sm" onclick="toggleUser(\'' + u.id + '\',true)">禁用</button>';
+          return [u.id, u.nickname || '-', u.phone || u.mobile || '-', statusBadge, u.role || 'user', formatTime(u.created_at), toggleBtn + ' <button class="btn btn-outline btn-sm" onclick="viewUserDetail(\'' + u.id + '\')">详情</button>'];
+        })
+      );
+    }).catch(function(err) {
+      container.innerHTML = '<div class="empty">加载失败: ' + err.message + '</div>';
+    });
+  }
+
+  window.toggleUser = function(id, disable) {
+    api('/api/admin/users/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({ disabled: disable }),
+    }).then(function() {
+      toast(disable ? '已禁用' : '已启用');
+      loadUsers();
+    }).catch(function(err) {
+      toast('操作失败: ' + err.message, 'error');
+    });
+  };
+
+  window.viewUserDetail = function(id) {
+    api('/api/admin/users/' + id).then(function(data) {
+      var user = data.user || data;
+      var html = '<h3>用户详情</h3>' +
+        '<div style="line-height:2;font-size:14px;">' +
+        '<p><strong>ID:</strong> ' + (user.id || '-') + '</p>' +
+        '<p><strong>昵称:</strong> ' + (user.nickname || '-') + '</p>' +
+        '<p><strong>手机号:</strong> ' + (user.phone || user.mobile || '-') + '</p>' +
+        '<p><strong>角色:</strong> ' + (user.role || 'user') + '</p>' +
+        '<p><strong>状态:</strong> ' + (user.disabled ? '已禁用' : '正常') + '</p>' +
+        '<p><strong>注册时间:</strong> ' + formatTime(user.created_at) + '</p>' +
+        '</div>';
+      showModal(html);
+    }).catch(function(err) {
+      toast('获取用户详情失败: ' + err.message, 'error');
+    });
+  };
+
+  // ==================== Records ====================
+  var currentRecordType = 'feeding';
+
+  document.getElementById('recordTabs').addEventListener('click', function(e) {
+    if (!e.target.classList.contains('tab')) return;
+    document.querySelectorAll('#recordTabs .tab').forEach(function(t) { t.classList.remove('active'); });
+    e.target.classList.add('active');
+    currentRecordType = e.target.getAttribute('data-type');
+    loadRecords();
+  });
+
+  function loadRecords() {
+    var container = document.getElementById('recordsTable');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div>加载中...</div>';
+
+    var typeLabels = { feeding: '喂养', sleep: '睡眠', diaper: '尿布', growth: '成长', medication: '用药', vaccination: '疫苗' };
+    document.getElementById('recordTitle').textContent = typeLabels[currentRecordType] + '记录';
+
+    api('/api/admin/records?type=' + currentRecordType + '&limit=100').then(function(data) {
+      var records = data.records || [];
+      document.getElementById('recordCount').textContent = '共 ' + records.length + ' 条';
+      if (records.length === 0) {
+        container.innerHTML = '<div class="empty">暂无记录</div>';
+        return;
+      }
+
+      var headers = ['ID', '用户', '宝宝', '内容', '时间'];
+      var rows = records.map(function(r) {
+        var content = '';
+        if (currentRecordType === 'feeding') content = (r.type || '') + ' ' + (r.amount || '') + (r.amount ? 'ml' : '') + ' ' + (r.duration || '');
+        else if (currentRecordType === 'sleep') content = (formatDuration(r.duration)) + ' ' + (r.quality || '');
+        else if (currentRecordType === 'diaper') content = (r.diaper_type || '') + ' ' + (r.color || '') + ' ' + (r.consistency || '');
+        else if (currentRecordType === 'growth') content = (r.height ? r.height + 'cm ' : '') + (r.weight ? r.weight + 'kg' : '');
+        else if (currentRecordType === 'medication') content = (r.name || '') + ' ' + (r.dosage || '') + ' ' + (r.frequency || '');
+        else if (currentRecordType === 'vaccination') content = (r.name || '') + ' ' + (r.dose || '');
+        else content = r.summary || '-';
+
+        return [r.id, r.user_name || r.user_id || '-', r.baby_name || r.baby_id || '-', content || '-', formatTime(r.created_at || r.time)];
+      });
+
+      container.innerHTML = renderTable(headers, rows);
+    }).catch(function(err) {
+      container.innerHTML = '<div class="empty">加载失败: ' + err.message + '</div>';
+    });
+  }
+
+  // ==================== Modal ====================
+  function showModal(html) {
+    document.getElementById('modalContent').innerHTML = '<button class="modal-close" onclick="closeModal()">&times;</button>' + html;
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+
+  window.closeModal = function() {
+    document.getElementById('modalOverlay').classList.remove('active');
+  };
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ==================== Helpers ====================
+  function renderTable(headers, rows) {
+    var thead = '<thead><tr>' + headers.map(function(h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead>';
+    var tbody = '<tbody>' + rows.map(function(row) {
+      return '<tr>' + row.map(function(cell) { return '<td>' + (cell == null ? '-' : cell) + '</td>'; }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+    return '<table>' + thead + tbody + '</table>';
+  }
+
+  function formatTime(ts) {
+    if (!ts) return '-';
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return ts;
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0') + ' ' +
+      String(d.getHours()).padStart(2, '0') + ':' +
+      String(d.getMinutes()).padStart(2, '0');
+  }
+
+  function formatDuration(minutes) {
+    if (!minutes && minutes !== 0) return '-';
+    var h = Math.floor(minutes / 60);
+    var m = minutes % 60;
+    return h > 0 ? h + '小时' + m + '分钟' : m + '分钟';
+  }
+
+  // ==================== Init ====================
+  if (state.apiBase && state.adminKey) {
+    document.getElementById('apiBase').value = state.apiBase;
+    document.getElementById('adminKey').value = state.adminKey;
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminLayout').classList.add('active');
+    navigate('dashboard');
+  }
+})();
+</script>
+</body>
+</html>

@@ -164,6 +164,7 @@ Page({
   },
 
   _doConfirm: function (recordType, data) {
+    if (!getFamilyId()) { wx.showToast({ title: '请先创建家庭信息', icon: 'none', duration: 2000 }); return }
     var self = this
     data.baby_id = data.baby_id || getBabyId()
 
