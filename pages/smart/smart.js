@@ -539,9 +539,10 @@ Page({
       var recType = result.record_type
       var text = result.text || '' // 语音识别出的文字
 
-      // 显示识别文字
+      // 显示识别文字，并填充到输入框让用户确认/修改
       if (text) {
         self._addMessage('user', '[语音] ' + text)
+        self.setData({ inputText: text })
       }
 
       if (intent === 'record' && recType && recType !== 'unknown') {

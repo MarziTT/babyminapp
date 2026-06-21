@@ -1,0 +1,39 @@
+<!-- 白噪音播放页面 -->
+<view class="container">
+  <text class="page-title">白噪音</text>
+  <text class="page-desc">程序生成的自然声音，帮助宝宝放松入睡</text>
+
+  <!-- 噪音列表 -->
+  <view class="noise-list">
+    <view
+      class="noise-item {{playingMap[item.id] ? 'playing' : ''}} {{loadingMap[item.id] ? 'loading' : ''}}"
+      wx:for="{{noises}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onToggleNoise"
+    >
+      <view class="noise-icon-wrap">
+        <text class="noise-icon">{{item.icon}}</text>
+        <view class="play-indicator" wx:if="{{loadingMap[item.id]}}">
+          <text class="loading-spin">⟳</text>
+        </view>
+        <view class="play-indicator" wx:elif="{{playingMap[item.id]}}">
+          <view class="equalizer">
+            <view class="eq-bar" style="animation-delay: 0s;"></view>
+            <view class="eq-bar" style="animation-delay: 0.15s;"></view>
+            <view class="eq-bar" style="animation-delay: 0.3s;"></view>
+          </view>
+        </view>
+      </view>
+      <view class="noise-info">
+        <text class="noise-name">{{item.name}}</text>
+        <text class="noise-desc">{{item.desc}}</text>
+      </view>
+      <view class="noise-action">
+        <text class="action-text {{playingMap[item.id] ? 'stop' : 'play'}}">
+          {{loadingMap[item.id] ? '加载中' : (playingMap[item.id] ? '停止' : '播放')}}
+        </text>
+      </view>
+    </view>
+  </view>
+</view>

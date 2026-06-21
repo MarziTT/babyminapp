@@ -1,0 +1,167 @@
+/**
+ * 白噪音页面样式
+ */
+
+.container {
+  padding: var(--space-lg) var(--space-md) calc(80rpx + env(safe-area-inset-bottom));
+  min-height: 100vh;
+}
+
+.page-title {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  display: block;
+  letter-spacing: -0.5rpx;
+}
+
+.page-desc {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-2xl);
+}
+
+/* 列表 */
+.noise-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.noise-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.noise-item:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-md);
+}
+
+.noise-item.playing {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border: 1rpx solid #a5d6a7;
+  box-shadow: 0 4rpx 20rpx rgba(76, 175, 80, 0.15);
+}
+
+.noise-item.loading {
+  opacity: 0.7;
+}
+
+/* 图标区 */
+.noise-icon-wrap {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-md);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.noise-icon {
+  font-size: 44rpx;
+}
+
+.play-indicator {
+  position: absolute;
+  bottom: -2rpx;
+  right: -2rpx;
+}
+
+.loading-spin {
+  display: block;
+  font-size: 28rpx;
+  color: var(--color-primary);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 均衡器动画 */
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 4rpx;
+  height: 24rpx;
+}
+
+.eq-bar {
+  width: 5rpx;
+  height: 8rpx;
+  background: #4caf50;
+  border-radius: 2rpx;
+  animation: eq-jump 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes eq-jump {
+  from { height: 6rpx; }
+  to { height: 22rpx; }
+}
+
+/* 信息 */
+.noise-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.noise-name {
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.noise-desc {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 操作按钮 */
+.noise-action {
+  flex-shrink: 0;
+  margin-left: var(--space-md);
+}
+
+.action-text {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  padding: 12rpx 28rpx;
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+
+.action-text.play {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.action-text.stop {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.action-text.loading {
+  background: var(--color-bg);
+  color: var(--text-tertiary);
+}

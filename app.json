@@ -27,7 +27,8 @@
     "pages/report/weekly/weekly",
     "pages/family/family",
     "pages/timer/timer",
-    "pages/player/player"
+    "pages/player/player",
+    "pages/white-noise/white-noise"
   ],
   "window": {
     "backgroundTextStyle": "light",

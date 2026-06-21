@@ -15,41 +15,39 @@ function calcBabyAgeText(birthday, today) {
   var birthDay = parseInt(parts[2])
   if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDay)) return ''
 
-  var nowYear = today.getFullYear()
-  var nowMonth = today.getMonth() + 1
-  var nowDay = today.getDate()
+  var birthDate = new Date(birthYear, birthMonth - 1, birthDay)
+  var totalDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24))
+  if (totalDays < 0) return '即将出生'
+  if (totalDays === 0) return '今天出生'
 
-  // 计算总月份差
-  var totalMonths = (nowYear - birthYear) * 12 + (nowMonth - birthMonth)
-  if (nowDay < birthDay) totalMonths -= 1
-
-  if (totalMonths < 0) return '即将出生'
-
-  var years = Math.floor(totalMonths / 12)
-  var months = totalMonths % 12
-
-  // 计算天数差（从上次月整点）
-  var lastMonthYear = nowYear
-  var lastMonthMonth = nowMonth - 1
-  if (lastMonthMonth === 0) {
-    lastMonthYear -= 1
-    lastMonthMonth = 12
+  // 从出生日开始逐月推进，计算整月数（正确处理跨月/月末对齐）
+  var months = 0
+  var cursor = new Date(birthDate)
+  while (true) {
+    var y = cursor.getFullYear()
+    var m = cursor.getMonth() // 0-based
+    var nextM = m + 1
+    var nextY = y
+    if (nextM > 11) { nextM = 0; nextY++ }
+    // 目标日 = birthDay，当月天数不够则取最后一天（如 1月31日 → 2月28日）
+    var maxDay = new Date(nextY, nextM + 1, 0).getDate()
+    var targetDay = Math.min(birthDay, maxDay)
+    var nextCursor = new Date(nextY, nextM, targetDay)
+    if (nextCursor > today) break
+    cursor = nextCursor
+    months++
   }
-  var daysInLastMonth = new Date(lastMonthYear, lastMonthMonth, 0).getDate()
-  var cmpDay = Math.min(birthDay, daysInLastMonth)
-  var refDate = new Date(lastMonthYear, lastMonthMonth - 1, cmpDay)
-  var diffDays = Math.floor((today - refDate) / (1000 * 60 * 60 * 24))
-  if (diffDays < 0) diffDays = 0
 
-  if (years > 0) {
-    return months > 0 ? years + '岁' + months + '个月' : years + '岁'
+  // 剩余天数（从最后整月纪念日到今天）
+  var days = Math.floor((today - cursor) / (1000 * 60 * 60 * 24))
+
+  if (months >= 24) {
+    var years = Math.floor(months / 12)
+    var remMonths = months % 12
+    return remMonths > 0 ? years + '岁' + remMonths + '个月' : years + '岁'
   } else if (months > 0) {
-    return diffDays > 0 ? months + '个月' + diffDays + '天' : months + '个月'
+    return days > 0 ? months + '个月' + days + '天' : months + '个月'
   } else {
-    // 计算总天数
-    var birthDate = new Date(birthYear, birthMonth - 1, birthDay)
-    var totalDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24))
-    if (totalDays < 0) totalDays = 0
     return totalDays + '天'
   }
 }
@@ -132,17 +130,26 @@ Page({
         var userAvatar = ''
         for (var i = 0; i < members.length; i++) {
           if (members[i].openid === openid && members[i].avatar_url) {
-            userAvatar = members[i].avatar_url
+            // 过滤微信默认灰色头像（URL 以 /132 结尾的 thirdwx.qlogo.cn 图片）
+            var av = members[i].avatar_url
+            if (!(av.indexOf('thirdwx.qlogo.cn') > -1 && av.indexOf('/132') > -1)) {
+              userAvatar = av
+            }
             break
           }
         }
         if (!userAvatar) {
           var userInfo = wx.getStorageSync('userInfo')
-          if (userInfo && userInfo.avatarUrl) userAvatar = userInfo.avatarUrl
+          if (userInfo && userInfo.avatarUrl) {
+            var av2 = userInfo.avatarUrl
+            if (!(av2.indexOf('thirdwx.qlogo.cn') > -1 && av2.indexOf('/132') > -1)) {
+              userAvatar = av2
+            }
+          }
         }
 
         self.setData({
-          familyId: res.familyId,
+          familyId: (res.familyId || '').replace(/\s/g, ''),
           babyName: babyName,
           babyBirthday: babyBirthday,
           babyAvatar: res.babyAvatar || '',
@@ -155,7 +162,7 @@ Page({
           hasFamily: true,
           loading: false
         })
-        setFamilyId(res.familyId)
+        setFamilyId(res.familyId ? res.familyId.replace(/\s/g, '') : '')
         setMyRole(res.myRole)
       })
       .catch(function () {

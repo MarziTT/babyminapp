@@ -25,9 +25,9 @@
     <!-- 宝宝信息卡片 -->
     <view class="baby-card">
       <view class="baby-card-bg"></view>
-      <image wx:if="{{userAvatar}}" class="baby-avatar" src="{{userAvatar}}" mode="aspectFill" />
-      <image wx:elif="{{babyAvatar}}" class="baby-avatar" src="{{babyAvatar}}" mode="aspectFill" />
-      <view wx:else class="baby-avatar-placeholder">
+      <image wx:if="{{userAvatar}}" class="baby-avatar" src="{{userAvatar}}" mode="aspectFill" bindtap="onMemberAvatarTap" data-openid="{{openid}}" />
+      <image wx:elif="{{babyAvatar}}" class="baby-avatar" src="{{babyAvatar}}" mode="aspectFill" bindtap="onMemberAvatarTap" data-openid="{{openid}}" />
+      <view wx:else class="baby-avatar-placeholder" bindtap="onMemberAvatarTap" data-openid="{{openid}}">
         <text class="placeholder-emoji">👶</text>
       </view>
       <view class="baby-info">
@@ -117,7 +117,7 @@
     <!-- 家庭切换 -->
     <view class="section">
       <view class="join-link" bindtap="onShowJoin">
-        <text class="join-link-text">加入其他家庭</text>
+        <text class="join-link-text">加入家庭</text>
         <text class="join-link-arrow">›</text>
       </view>
     </view>
