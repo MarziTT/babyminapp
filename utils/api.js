@@ -139,7 +139,7 @@ function voiceToRecord(audioBase64, format) {
   return request('/api/ai/voice-to-record', {
     method: 'POST',
     data: { audio: audioBase64, format: format || 'mp3' },
-    showLoading: true,
+    showLoading: false,
   })
 }
 
